@@ -1,0 +1,9 @@
+{
+  "/u/[username]/page": "app/u/[username]/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/organization/[id]/page": "app/organization/[id]/page.js",
+  "/organization/[id]/people/page": "app/organization/[id]/people/page.js",
+  "/organizations/page": "app/organizations/page.js",
+  "/experiences/page": "app/experiences/page.js",
+  "/experiences/cards/page": "app/experiences/cards/page.js"
+}

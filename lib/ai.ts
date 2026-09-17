@@ -1,0 +1,3 @@
+const OPENAI_URL = "https://api.openai.com/v1/responses";
+export const AI_MODEL = process.env.OPENAI_MODEL || "gpt-5.6-luna";
+export async function generateAI(input:string){const key=process.env.OPENAI_API_KEY;if(!key)throw new Error("OPENAI_API_KEY is not configured.");const res=await fetch(OPENAI_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},body:JSON.stringify({model:AI_MODEL,input}),cache:"no-store"});const data=await res.json();if(!res.ok)throw new Error(data?.error?.message||"OpenAI request failed.");const text=data?.output_text||data?.output?.flatMap((x:any)=>x?.content||[]).map((x:any)=>x?.text||"").join("")||"";if(!text)throw new Error("The AI returned an empty response.");return text;}
