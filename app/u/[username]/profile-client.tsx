@@ -17,7 +17,17 @@ import type { Profile } from "@/lib/types";
 import QRCode from "qrcode";
 import { normalizeUrl } from "@/components/normalizeUrl";
 import BrandMark from "@/components/brand-mark";
-export default function ProfileClient({ profile }: { profile: Profile }) {
+export default function ProfileClient({
+  profile,
+  analyticsProfileId,
+  analyticsPersonId,
+  analyticsOrganizationId,
+}: {
+  profile: Profile;
+  analyticsProfileId?: string | null;
+  analyticsPersonId?: string | null;
+  analyticsOrganizationId?: string | null;
+}) {
   const [coverFailed, setCoverFailed] = useState(false);
   const url =
     typeof window !== "undefined"
@@ -27,7 +37,12 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
     fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profileId: profile?.id, eventType: "view" }),
+      body: JSON.stringify({
+        profileId: analyticsProfileId,
+        personId: analyticsPersonId,
+        organizationId: analyticsOrganizationId,
+        eventType: "view",
+      }),
     }).catch(() => {});
   }, [profile?.id]);
   async function qr() {
@@ -42,7 +57,9 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        profileId: profile?.id,
+        profileId: analyticsProfileId,
+        personId: analyticsPersonId,
+        organizationId: analyticsOrganizationId,
         eventType: "link_click",
         target,
       }),
@@ -59,7 +76,9 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        profileId: profile?.id,
+        profileId: analyticsProfileId,
+        personId: analyticsPersonId,
+        organizationId: analyticsOrganizationId,
         eventType: "contact_save",
       }),
     }).catch(() => {});
@@ -72,6 +91,7 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
     ["TikTok", profile?.tiktok, ExternalLink],
     ["GitHub", profile.github, Github],
   ].filter((x) => x[1]);
+  const links = (profile.link_items || []).filter((link) => link?.title && link?.url);
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8">
       <div className="mx-auto max-w-md overflow-hidden rounded-[2rem] bg-white shadow-xl">
@@ -141,6 +161,12 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
             </button>
           </div>
           <div className="mt-7 space-y-3 text-left">
+            {links.map((link) => (
+              <a key={`${link.title}-${link.url}`} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer" onClick={() => click(link.title)} className="flex items-center justify-between rounded-xl bg-slate-950 p-4 text-white shadow-sm">
+                <span className="font-semibold">{link.title}</span>
+                <ExternalLink size={16} className="text-white/60" />
+              </a>
+            ))}
             {profile?.email && (
               <a
                 onClick={() => click("email")}
@@ -182,7 +208,10 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
             </div>
           )}
           <AIAssistant username={profile?.username} />
-          <div className="mt-8 flex items-center justify-center gap-1.5 text-xs text-slate-400"><BrandMark /><span>Powered by Linkora</span></div>
+          <div className="mt-8 flex items-center justify-center gap-1.5 text-xs text-slate-400">
+            <BrandMark />
+            <span>Powered by Connectora</span>
+          </div>
         </div>
       </div>
     </main>

@@ -1,11 +1,11 @@
-# Linkora v3 — People, Organizations, Experiences & AI
+# Connectora v3 — People, Organizations, Experiences & AI
 
-Linkora is a digital identity and physical-world interaction platform built with Next.js, Supabase and an AI layer.
+Connectora is a digital identity and physical-world interaction platform built with Next.js, Supabase and an AI layer.
 
 ## Product architecture
 
 ```text
-                         LINKORA
+                         CONNECTORA
                            │
           ┌────────────────┼────────────────┐
           │                │                │
@@ -19,7 +19,7 @@ Linkora is a digital identity and physical-world interaction platform built with
                                         Analytics
                            │
                            ▼
-                      LINKORA AI
+                      CONNECTORA AI
                            │
        ┌───────────────────┼───────────────────┐
        │                   │                   │
@@ -48,7 +48,7 @@ Linkora is a digital identity and physical-world interaction platform built with
 - `/m/[slug]` — public menu
 - `/c/[cardUid]` — stable NFC/QR card resolver
 - `/u/[username]` — public personal profile
-- `/ai` — Linkora AI workspace
+- `/ai` — Connectora AI workspace
 - `/admin` — platform admin overview
 
 ## AI
@@ -68,7 +68,7 @@ Set `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in `.env.local`.
 
 ## NFC model
 
-Linkora does not need to read the physical chip UID in the browser. Register a Linkora `card_uid` and write the stable URL `/c/[cardUid]` to the NFC tag. The resolver can then point the card to a profile or other experience without rewriting the tag.
+Connectora does not need to read the physical chip UID in the browser. Register a Connectora `card_uid` and write the stable URL `/c/[cardUid]` to the NFC tag. The resolver can then point the card to a profile or other experience without rewriting the tag.
 
 ## Production hardening before launch
 

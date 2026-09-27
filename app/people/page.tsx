@@ -51,7 +51,7 @@ export default async function PeoplePage() {
           </div>
           <div className="flex gap-2">
             <Link href="/ai" className="btn-secondary gap-2">
-              <Sparkles size={16} /> Linkora AI
+              <Sparkles size={16} /> Connectora AI
             </Link>
             <Link
               target="_blank"
@@ -85,7 +85,7 @@ export default async function PeoplePage() {
               <div>
                 <h2 className="text-xl font-bold">Digital Profile</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Your public Linkora identity.
+                  Your public Connectora identity.
                 </p>
               </div>
               <Link href="/dashboard/profile" className="btn-secondary">
@@ -162,7 +162,7 @@ export default async function PeoplePage() {
             href="/ai"
             className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-coral-600"
           >
-            Open Linkora AI <ArrowRight size={16} />
+            Open Connectora AI <ArrowRight size={16} />
           </Link>
         </div>
       </div>

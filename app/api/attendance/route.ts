@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         organization_id: organizationId,
         person_id: personId,
         type,
-        metadata: { source: "linkora_checkin_station", recorded_by: user.id },
+        metadata: { source: "connectora_checkin_station", recorded_by: user.id },
       })
       .select("id,scanned_at,type")
       .single();
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         event_type:
           type === "check_in" ? "attendance_check_in" : "attendance_check_out",
         organization_id: organizationId,
-        metadata: { person_id: personId, source: "linkora_checkin_station" },
+        metadata: { person_id: personId, source: "connectora_checkin_station" },
       });
     return NextResponse.json({ record, person });
   } catch (e: any) {

@@ -17,7 +17,10 @@ export default function Register() {
     const { error } = await createClient().auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } },
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+      },
     });
     if (error) setError(error.message);
     else setDone(true);
@@ -41,7 +44,7 @@ export default function Register() {
     <main className="min-h-screen grid place-items-center p-5">
       <div className="card w-full max-w-md p-8">
         <Link href="/" className="text-xl font-black">
-          linkora
+          connectora
         </Link>
         <h1 className="mt-8 text-3xl font-black">Create your identity</h1>
         <form onSubmit={submit} className="mt-7 space-y-4">

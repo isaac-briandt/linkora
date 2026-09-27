@@ -1,7 +1,15 @@
 "use client";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Download, Plus, Upload, UserPlus } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  UserPlus,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
 import { downloadCsv, readCsv } from "@/lib/csv";
 export default function PeoplePage({
@@ -12,13 +20,12 @@ export default function PeoplePage({
   const [id, setId] = useState("");
   const [org, setOrg] = useState<any>(null);
   const [people, setPeople] = useState<any[]>([]);
-  const [cards, setCards] = useState<any[]>([]);
-  const [selectedPerson, setSelectedPerson] = useState<any>(null);
-  const [cardId, setCardId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest" | "name">("newest");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [assignmentBusy, setAssignmentBusy] = useState(false);
   const [importBusy, setImportBusy] = useState(false);
   const [message, setMessage] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
@@ -30,30 +37,32 @@ export default function PeoplePage({
   }, []);
   async function load(oid: string) {
     const s = createClient();
-    const [{ data: o }, { data: p }, { data: c }] = await Promise.all([
+    const [{ data: o }, { data: p }] = await Promise.all([
       s.from("organizations").select("*").eq("id", oid).single(),
       s
         .from("people")
         .select("*")
         .eq("organization_id", oid)
         .order("created_at", { ascending: false }),
-      s
-        .from("nfc_cards")
-        .select("id,card_uid,label,person_id")
-        .eq("organization_id", oid)
-        .order("created_at", { ascending: false }),
     ]);
     setOrg(o);
     setPeople(p || []);
-    setCards(c || []);
   }
   async function add() {
     if (!name.trim()) return;
     setBusy(true);
     const s = createClient();
-    const { error } = await s
-      .from("people")
-      .insert({ organization_id: id, full_name: name, email });
+    const { error } = await s.from("people").insert({
+      organization_id: id,
+      full_name: name,
+      username: `${name
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")}-${Date.now().toString(36)}`,
+      company: org?.name || "",
+      email: email || null,
+    });
     if (!error) {
       setName("");
       setEmail("");
@@ -61,29 +70,55 @@ export default function PeoplePage({
     }
     setBusy(false);
   }
-  function selectPerson(person: any) {
-    setSelectedPerson(person);
-    setCardId("");
+  async function removePerson(person: any) {
+    if (
+      !window.confirm(
+        `Delete ${person.full_name}? Their engagement history will also be deleted and assigned cards will become unassigned.`,
+      )
+    )
+      return;
+    setDeletingId(person.id);
     setMessage("");
-  }
-  async function assignCard() {
-    if (!selectedPerson || !cardId) return;
-    setAssignmentBusy(true);
-    setMessage("");
-    const s = createClient();
-    const { error } = await s
-      .from("nfc_cards")
-      .update({ person_id: selectedPerson.id })
-      .eq("id", cardId)
+    const { error } = await createClient()
+      .from("people")
+      .delete()
+      .eq("id", person.id)
       .eq("organization_id", id);
     if (error) setMessage(error.message);
     else {
-      setMessage("Card assigned.");
-      setCardId("");
-      await load(id);
+      setPeople((current) => current.filter((item) => item.id !== person.id));
+      setMessage(`${person.full_name} was deleted.`);
     }
-    setAssignmentBusy(false);
+    setDeletingId(null);
   }
+  const visiblePeople = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return people
+      .filter(
+        (person) =>
+          !normalized ||
+          [
+            person.full_name,
+            person.email,
+            person.title,
+            person.username,
+            person.status,
+          ].some((value) =>
+            String(value || "")
+              .toLowerCase()
+              .includes(normalized),
+          ),
+      )
+      .sort((a, b) =>
+        sort === "name"
+          ? String(a.full_name || "").localeCompare(String(b.full_name || ""))
+          : sort === "oldest"
+            ? new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()
+            : new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
+      );
+  }, [people, query, sort]);
   function exportPeople() {
     downloadCsv(
       `${org?.slug || "organization"}-people.csv`,
@@ -102,7 +137,9 @@ export default function PeoplePage({
       if (!rows.length) throw new Error("The CSV has no rows.");
       const s = createClient();
       const existingByEmail = new Map(
-        people.filter((person) => person.email).map((person) => [person.email.toLowerCase(), person]),
+        people
+          .filter((person) => person.email)
+          .map((person) => [person.email.toLowerCase(), person]),
       );
       let imported = 0;
       let skipped = 0;
@@ -119,17 +156,29 @@ export default function PeoplePage({
           phone: row.phone || null,
           status: row.status === "inactive" ? "inactive" : "active",
         };
-        const existing = row.email ? existingByEmail.get(row.email.toLowerCase()) : null;
+        const existing = row.email
+          ? existingByEmail.get(row.email.toLowerCase())
+          : null;
         const { error } = existing
-          ? await s.from("people").update(person).eq("id", existing.id).eq("organization_id", id)
+          ? await s
+              .from("people")
+              .update(person)
+              .eq("id", existing.id)
+              .eq("organization_id", id)
           : await s.from("people").insert({ ...person, organization_id: id });
         if (error) skipped += 1;
         else imported += 1;
       }
       await load(id);
-      setMessage(`Imported ${imported} people${skipped ? `; skipped ${skipped}.` : "."}`);
+      setMessage(
+        `Imported ${imported} people${skipped ? `; skipped ${skipped}.` : "."}`,
+      );
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not read that CSV file.");
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not read that CSV file.",
+      );
     }
     setImportBusy(false);
   }
@@ -158,16 +207,35 @@ export default function PeoplePage({
             <UserPlus className="text-coral-600" />
             <h2 className="mt-4 text-xl font-bold">Add person</h2>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button onClick={exportPeople} disabled={!people.length} className="btn-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-50">
+              <button
+                onClick={exportPeople}
+                disabled={!people.length}
+                className="btn-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
                 <Download size={16} /> Export CSV
               </button>
-              <button onClick={() => importInput.current?.click()} disabled={importBusy} className="btn-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-50">
+              <button
+                onClick={() => importInput.current?.click()}
+                disabled={importBusy}
+                className="btn-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
                 <Upload size={16} /> {importBusy ? "Importing…" : "Import CSV"}
               </button>
-              <input ref={importInput} type="file" accept=".csv,text/csv" onChange={importPeople} className="hidden" />
+              <input
+                ref={importInput}
+                type="file"
+                accept=".csv,text/csv"
+                onChange={importPeople}
+                className="hidden"
+              />
             </div>
-            <p className="mt-3 text-xs leading-5 text-slate-500">CSV columns: full_name, email, external_id, title, phone, status. Matching emails update existing people.</p>
-            {message && <p className="mt-3 text-sm text-slate-600">{message}</p>}
+            <p className="mt-3 text-xs leading-5 text-slate-500">
+              CSV columns: full_name, email, external_id, title, phone, status.
+              Matching emails update existing people.
+            </p>
+            {message && (
+              <p className="mt-3 text-sm text-slate-600">{message}</p>
+            )}
             <div className="mt-5 space-y-4">
               <div>
                 <label className="label">Full name</label>
@@ -199,84 +267,92 @@ export default function PeoplePage({
             </div>
           </div>
           <div className="space-y-6">
-            {selectedPerson && (
-              <section className="card p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 text-coral-600">
-                      <CreditCard size={18} />
-                      <h2 className="text-xl font-bold text-slate-900">
-                        Assign a card
-                      </h2>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Choose a card for {selectedPerson.full_name}.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedPerson(null)}
-                    className="text-sm font-semibold text-slate-500 hover:text-slate-900"
-                  >
-                    Close
-                  </button>
+            <section className="card p-6">
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                  <h2 className="text-xl font-bold">
+                    People ({visiblePeople.length}
+                    {query ? ` of ${people.length}` : ""})
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Click a person to view their engagement.
+                  </p>
                 </div>
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <label className="relative block">
+                    <Search
+                      size={16}
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      className="input pl-9 sm:w-56"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder=""
+                      aria-label="Search people"
+                    />
+                  </label>
                   <select
-                    className="input"
-                    value={cardId}
-                    onChange={(e) => setCardId(e.target.value)}
+                    className="input sm:w-40"
+                    value={sort}
+                    onChange={(event) =>
+                      setSort(event.target.value as typeof sort)
+                    }
+                    aria-label="Sort people"
                   >
-                    <option value="">Select a card</option>
-                    {cards.map((card) => (
-                      <option key={card.id} value={card.id}>
-                        {card.label || card.card_uid}
-                        {card.person_id ? " (reassign)" : ""}
-                      </option>
-                    ))}
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="name">Name A-Z</option>
                   </select>
-                  <button
-                    onClick={assignCard}
-                    disabled={assignmentBusy || !cardId}
-                    className="btn-primary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {assignmentBusy ? "Assigning…" : "Assign card"}
-                  </button>
                 </div>
-                {!cards.length && (
-                  <p className="mt-3 text-sm text-slate-500">
-                    Register a card first from the Cards page.
+              </div>
+              <div className="mt-5 space-y-3">
+                {visiblePeople.length ? (
+                  visiblePeople.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex w-full flex-col gap-4 rounded-xl border p-4 text-left transition hover:border-coral-300 hover:bg-coral-50 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <Link
+                        href={`/organization/${id}/people/${p.id}/engagement`}
+                        className="min-w-0 flex-1"
+                      >
+                        <b>{p?.full_name ?? ""}</b>
+                        <p className="text-sm text-slate-500">
+                          {p?.email ?? "No email"} · {p?.status}
+                        </p>
+                        <p className="mt-2 text-xs font-semibold text-coral-600">
+                          View engagement →
+                        </p>
+                      </Link>
+                      <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-coral-600">
+                        <Link
+                          href={`/organization/${id}/people/${p.id}`}
+                          className="rounded-lg border border-coral-200 px-3 py-2 hover:bg-coral-50"
+                        >
+                          Edit profile & assign card
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => removePerson(p)}
+                          disabled={deletingId === p.id}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-2 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                          aria-label={`Delete ${p.full_name}`}
+                        >
+                          <Trash2 size={15} />{" "}
+                          {deletingId === p.id ? "Deleting…" : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                    {query
+                      ? "No people match that search."
+                      : "No people added yet."}
                   </p>
                 )}
-                {message && <p className="mt-3 text-sm text-slate-600">{message}</p>}
-              </section>
-            )}
-            <section className="card p-6">
-              <h2 className="text-xl font-bold">People ({people.length})</h2>
-            <div className="mt-5 space-y-3">
-              {people.length ? (
-                people.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => selectPerson(p)}
-                    className="flex w-full items-center justify-between rounded-xl border p-4 text-left transition hover:border-coral-300 hover:bg-coral-50"
-                  >
-                    <div>
-                      <b>{p?.full_name ?? ""}</b>
-                      <p className="text-sm text-slate-500">
-                        {p?.email ?? "No email"} · {p?.status}
-                      </p>
-                    </div>
-                    <span className="text-xs font-semibold text-coral-600">
-                      Assign card
-                    </span>
-                  </button>
-                ))
-              ) : (
-                <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
-                  No people added yet.
-                </p>
-              )}
-            </div>
+              </div>
             </section>
           </div>
         </div>

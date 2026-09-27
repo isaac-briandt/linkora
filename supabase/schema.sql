@@ -6,7 +6,7 @@ create table if not exists public.profiles (
   username text unique not null,
   full_name text not null default '', title text default '', company text default '', bio text default '', avatar_url text default '', cover_image_url text default '',
   phone text default '', email text default '', website text default '', linkedin text default '', instagram text default '', facebook text default '',
-  x_url text default '', tiktok text default '', github text default '', whatsapp text default '',
+  x_url text default '', tiktok text default '', github text default '', whatsapp text default '', link_items jsonb not null default '[]'::jsonb,
   role text not null default 'user' check (role in ('user','platform_admin','super_admin')),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
@@ -15,7 +15,7 @@ alter table public.profiles add column if not exists cover_image_url text defaul
 
 -- Public profile imagery. Users can only write inside their own folder.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('profile-media', 'profile-media', true, 5242880, array['image/jpeg','image/png','image/webp','image/gif'])
+values ('profile-media', 'profile-media', true, 10485760, array['image/jpeg','image/png','image/webp','image/gif','application/pdf'])
 on conflict (id) do update set public = true, file_size_limit = 5242880, allowed_mime_types = excluded.allowed_mime_types;
 drop policy if exists profile_media_public_read on storage.objects;
 drop policy if exists profile_media_owner_insert on storage.objects;
@@ -39,10 +39,31 @@ create table if not exists public.organization_members (
 );
 create table if not exists public.people (
   id uuid primary key default gen_random_uuid(), organization_id uuid references public.organizations(id) on delete cascade,
-  profile_id uuid references public.profiles(id) on delete set null, external_id text, full_name text not null, title text, email text, phone text,
+  profile_id uuid references public.profiles(id) on delete set null, external_id text, username text, full_name text not null, title text, company text, bio text,
+  email text, phone text, whatsapp text, website text, linkedin text, instagram text, facebook text, x_url text, tiktok text, github text,
+  avatar_url text, cover_image_url text, link_items jsonb not null default '[]'::jsonb,
+  engagement_share_token text default encode(gen_random_bytes(24), 'hex'),
   metadata jsonb not null default '{}'::jsonb, status text not null default 'active' check(status in ('active','inactive')),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+alter table public.people add column if not exists username text;
+alter table public.people add column if not exists company text;
+alter table public.people add column if not exists bio text;
+alter table public.people add column if not exists whatsapp text;
+alter table public.people add column if not exists website text;
+alter table public.people add column if not exists linkedin text;
+alter table public.people add column if not exists instagram text;
+alter table public.people add column if not exists facebook text;
+alter table public.people add column if not exists x_url text;
+alter table public.people add column if not exists tiktok text;
+alter table public.people add column if not exists github text;
+alter table public.people add column if not exists avatar_url text;
+alter table public.people add column if not exists cover_image_url text;
+alter table public.profiles add column if not exists link_items jsonb not null default '[]'::jsonb;
+alter table public.people add column if not exists link_items jsonb not null default '[]'::jsonb;
+alter table public.people add column if not exists engagement_share_token text default encode(gen_random_bytes(24), 'hex');
+create unique index if not exists people_username_unique on public.people(username) where username is not null;
+create unique index if not exists people_engagement_share_token_unique on public.people(engagement_share_token) where engagement_share_token is not null;
 do $$ begin alter table public.organization_members drop constraint if exists organization_members_person_fk; alter table public.organization_members add constraint organization_members_person_fk foreign key (person_id) references public.people(id) on delete cascade; exception when duplicate_object then null; end $$;
 
 -- Physical/digital cards
@@ -59,9 +80,10 @@ create table if not exists public.nfc_cards (
 create table if not exists public.engagement_events (
   id uuid primary key default gen_random_uuid(), event_type text not null,
   profile_id uuid references public.profiles(id) on delete cascade, organization_id uuid references public.organizations(id) on delete cascade,
-  card_id uuid references public.nfc_cards(id) on delete cascade, target text, metadata jsonb not null default '{}'::jsonb,
+  person_id uuid references public.people(id) on delete cascade, card_id uuid references public.nfc_cards(id) on delete cascade, target text, metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+alter table public.engagement_events add column if not exists person_id uuid references public.people(id) on delete cascade;
 create table if not exists public.profile_events (
   id uuid primary key default gen_random_uuid(), profile_id uuid not null references public.profiles(id) on delete cascade,
   event_type text not null check(event_type in ('view','link_click','contact_save')), target text, created_at timestamptz not null default now()
@@ -82,8 +104,11 @@ create table if not exists public.attendance_records (
 -- Menus
 create table if not exists public.menus (
   id uuid primary key default gen_random_uuid(), organization_id uuid not null references public.organizations(id) on delete cascade,
-  name text not null, slug text unique not null, description text, active boolean not null default true, created_at timestamptz not null default now()
+  name text not null, slug text unique not null, description text, menu_file_url text, menu_file_name text, menu_external_url text, active boolean not null default true, created_at timestamptz not null default now()
 );
+alter table public.menus add column if not exists menu_file_url text;
+alter table public.menus add column if not exists menu_file_name text;
+alter table public.menus add column if not exists menu_external_url text;
 create table if not exists public.menu_sections (
   id uuid primary key default gen_random_uuid(), menu_id uuid not null references public.menus(id) on delete cascade,
   name text not null, sort_order int not null default 0
@@ -144,7 +169,7 @@ create policy members_insert on public.organization_members for insert with chec
 create policy members_update on public.organization_members for update using(public.is_org_member(organization_id) or public.is_platform_admin());
 create policy members_delete on public.organization_members for delete using(public.is_org_member(organization_id) or public.is_platform_admin());
 
-create policy people_select on public.people for select using(public.is_org_member(organization_id) or public.is_platform_admin());
+create policy people_select on public.people for select using(status='active' or public.is_org_member(organization_id) or public.is_platform_admin());
 create policy people_insert on public.people for insert with check(public.is_org_member(organization_id) or public.is_platform_admin());
 create policy people_update on public.people for update using(public.is_org_member(organization_id) or public.is_platform_admin());
 create policy people_delete on public.people for delete using(public.is_org_member(organization_id) or public.is_platform_admin());
@@ -170,6 +195,18 @@ create policy items_public_select on public.menu_items for select using(exists(s
 create policy items_manage on public.menu_items for all using(exists(select 1 from public.menu_sections s join public.menus m on m.id=s.menu_id where s.id=section_id and (public.is_org_member(m.organization_id) or public.is_platform_admin()))) with check(exists(select 1 from public.menu_sections s join public.menus m on m.id=s.menu_id where s.id=section_id and (public.is_org_member(m.organization_id) or public.is_platform_admin())));
 
 create policy platform_admin_select on public.platform_admins for select using(auth.uid()=profile_id or public.is_platform_admin());
+
+create or replace function public.get_public_person_engagement(share_token text)
+returns jsonb language sql security definer set search_path=public as $$
+  select jsonb_build_object(
+    'person', jsonb_build_object('full_name', p.full_name, 'title', p.title, 'company', p.company),
+    'events', coalesce(jsonb_agg(jsonb_build_object('event_type', e.event_type, 'target', e.target, 'created_at', e.created_at, 'metadata', e.metadata) order by e.created_at desc) filter (where e.id is not null), '[]'::jsonb)
+  )
+  from public.people p
+  left join public.engagement_events e on e.person_id = p.id
+  where p.engagement_share_token = share_token and p.status = 'active'
+  group by p.id, p.full_name, p.title, p.company;
+$$;
 
 create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$
 begin

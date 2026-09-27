@@ -26,7 +26,7 @@ export default async function AdminPage() {
           <ShieldCheck className="mx-auto text-coral-600" size={40} />
           <h1 className="mt-4 text-2xl font-black">Platform admin access</h1>
           <p className="mt-2 text-slate-500">
-            Your account is not a Linkora platform administrator.
+            Your account is not a Connectora platform administrator.
           </p>
           <Link href="/dashboard" className="btn-primary mt-6">
             Back to dashboard
@@ -57,7 +57,7 @@ export default async function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-coral-600">
-              LINKORA PLATFORM
+              CONNECTORA PLATFORM
             </p>
             <h1 className="mt-1 text-3xl font-black">Admin overview</h1>
             <p className="mt-2 text-slate-500">

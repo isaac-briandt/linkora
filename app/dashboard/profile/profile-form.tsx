@@ -10,6 +10,7 @@ export default function ProfileForm({ initial }: { initial: Profile }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<keyof Profile | null>(null);
   const [msg, setMsg] = useState("");
+  const [links, setLinks] = useState<{ title: string; url: string }[]>(initial.link_items || []);
   function set(k: keyof Profile, v: string) {
     setForm((x) => ({ ...x, [k]: v }));
   }
@@ -18,7 +19,7 @@ export default function ProfileForm({ initial }: { initial: Profile }) {
     setMsg("");
     const { error } = await createClient()
       .from("profiles")
-      .update(form)
+      .update({ ...form, link_items: links.filter((link) => link.title.trim() && link.url.trim()) })
       .eq("id", form.id);
     setMsg(error ? error.message : "Profile saved successfully.");
     setSaving(false);
@@ -121,6 +122,14 @@ export default function ProfileForm({ initial }: { initial: Profile }) {
             {saving ? "Saving…" : "Save changes"}
           </button>
           {msg && <span className="text-sm text-slate-600">{msg}</span>}
+        </div>
+        <div className="mt-8 border-t pt-6">
+          <h2 className="text-xl font-bold">Featured links</h2>
+          <p className="mt-1 text-sm text-slate-500">Add the links you want people to see first.</p>
+          <div className="mt-4 space-y-3">
+            {links.map((link, index) => <div key={index} className="grid gap-3 sm:grid-cols-[.8fr_1.2fr_auto]"><input className="input" value={link.title} placeholder="Button title" onChange={(event) => setLinks((current) => current.map((item, i) => i === index ? { ...item, title: event.target.value } : item))} /><input className="input" value={link.url} placeholder="https://example.com" onChange={(event) => setLinks((current) => current.map((item, i) => i === index ? { ...item, url: event.target.value } : item))} /><button type="button" className="text-sm font-semibold text-red-600" onClick={() => setLinks((current) => current.filter((_, i) => i !== index))}>Remove</button></div>)}
+          </div>
+          <button type="button" className="btn-secondary mt-4" onClick={() => setLinks((current) => [...current, { title: "", url: "" }])}>Add link</button>
         </div>
       </div>
     </div>

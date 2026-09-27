@@ -17,6 +17,7 @@ export type Profile = {
   tiktok: string;
   github: string;
   whatsapp: string;
+  link_items?: { title: string; url: string }[] | null;
 };
 export type Organization = {
   id: string;
