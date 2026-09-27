@@ -24,7 +24,9 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
     }
     const { data, error } = await createClient()
       .from("menus")
-      .select("id,name,slug,active,created_at,menu_file_url,menu_file_name,menu_external_url,organizations(name)")
+      .select(
+        "id,name,slug,active,created_at,menu_file_url,menu_file_name,menu_external_url,organizations(name)",
+      )
       .in("organization_id", ids)
       .order("created_at", { ascending: false });
     if (error) setMessage(error.message);
@@ -40,13 +42,26 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
       setMessage("Select an organization and enter a menu name and slug.");
       return;
     }
-    if (file && !file.type.startsWith("image/") && file.type !== "application/pdf") return setMessage("Upload a PDF or image menu.");
-    if (file && file.size > 10 * 1024 * 1024) return setMessage("Menu files must be 10 MB or smaller.");
+    if (
+      file &&
+      !file.type.startsWith("image/") &&
+      file.type !== "application/pdf"
+    )
+      return setMessage("Upload a PDF or image menu.");
+    if (file && file.size > 10 * 1024 * 1024)
+      return setMessage("Menu files must be 10 MB or smaller.");
     const cleanExternalUrl = externalUrl.trim();
-    if (file && cleanExternalUrl) return setMessage("Use either an uploaded menu or an external menu link, not both.");
+    if (file && cleanExternalUrl)
+      return setMessage(
+        "Use either an uploaded menu or an external menu link, not both.",
+      );
     if (cleanExternalUrl) {
-      try { const url = new URL(cleanExternalUrl); if (!["http:", "https:"].includes(url.protocol)) throw new Error(); }
-      catch { return setMessage("Enter a complete http:// or https:// menu link."); }
+      try {
+        const url = new URL(cleanExternalUrl);
+        if (!["http:", "https:"].includes(url.protocol)) throw new Error();
+      } catch {
+        return setMessage("Enter a complete http:// or https:// menu link.");
+      }
     }
     setBusy(true);
     const cleanSlug = slug
@@ -54,27 +69,42 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, "-");
     const client = createClient();
-    const { error } = await client
-      .from("menus")
-      .insert({
-        organization_id: orgId,
-        name: name.trim(),
-        slug: cleanSlug,
-        description: "Published with Connectora",
-        menu_external_url: cleanExternalUrl || null,
-        active: true,
-      });
+    const { error } = await client.from("menus").insert({
+      organization_id: orgId,
+      name: name.trim(),
+      slug: cleanSlug,
+      description: "Published with Connectora",
+      menu_external_url: cleanExternalUrl || null,
+      active: true,
+    });
     if (error) setMessage(error.message);
     else {
       if (file) {
-        const { data: { user } } = await client.auth.getUser();
+        const {
+          data: { user },
+        } = await client.auth.getUser();
         if (user) {
-          const { data: createdMenu } = await client.from("menus").select("id").eq("slug", cleanSlug).single();
+          const { data: createdMenu } = await client
+            .from("menus")
+            .select("id")
+            .eq("slug", cleanSlug)
+            .single();
           const path = `${user.id}/menus/${createdMenu?.id || cleanSlug}-${file.name.replace(/[^a-z0-9._-]/gi, "-")}`;
-          const upload = await client.storage.from("profile-media").upload(path, file, { contentType: file.type, upsert: true });
+          const upload = await client.storage
+            .from("profile-media")
+            .upload(path, file, { contentType: file.type, upsert: true });
           if (!upload.error) {
-            const { data: publicUrl } = client.storage.from("profile-media").getPublicUrl(path);
-            if (createdMenu?.id) await client.from("menus").update({ menu_file_url: publicUrl.publicUrl, menu_file_name: file.name }).eq("id", createdMenu.id);
+            const { data: publicUrl } = client.storage
+              .from("profile-media")
+              .getPublicUrl(path);
+            if (createdMenu?.id)
+              await client
+                .from("menus")
+                .update({
+                  menu_file_url: publicUrl.publicUrl,
+                  menu_file_name: file.name,
+                })
+                .eq("id", createdMenu.id);
           }
         }
       }
@@ -117,14 +147,38 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
             />
           </div>
           <div>
-            <label className="label">Upload menu <span className="font-normal text-slate-400">(optional PDF or image)</span></label>
-            <input className="input" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" onChange={(event) => setFile(event.target.files?.[0] || null)} />
-            <p className="mt-1.5 text-xs text-slate-500">The file will be included on the public menu page.</p>
+            <label className="label">
+              Upload menu{" "}
+              <span className="font-normal text-slate-400">
+                (optional PDF or image)
+              </span>
+            </label>
+            <input
+              className="input"
+              type="file"
+              accept="application/pdf,image/png,image/jpeg,image/webp"
+              onChange={(event) => setFile(event.target.files?.[0] || null)}
+            />
+            <p className="mt-1.5 text-xs text-slate-500">
+              The file will be included on the public menu page.
+            </p>
           </div>
           <div>
-            <label className="label">Existing menu link <span className="font-normal text-slate-400">(optional)</span></label>
-            <input className="input" type="url" value={externalUrl} onChange={(event) => setExternalUrl(event.target.value)} placeholder="https://yourrestaurant.com/menu" />
-            <p className="mt-1.5 text-xs text-slate-500">Connectora will wrap this in your Connectora menu URL for QR codes and NFC cards.</p>
+            <label className="label">
+              Existing menu link{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
+            </label>
+            <input
+              className="input"
+              type="url"
+              value={externalUrl}
+              onChange={(event) => setExternalUrl(event.target.value)}
+              placeholder="https://yourrestaurant.com/menu"
+            />
+            <p className="mt-1.5 text-xs text-slate-500">
+              Connectora will wrap this in your Connectora menu URL for QR codes
+              and NFC cards.
+            </p>
           </div>
           <div>
             <label className="label">Public slug</label>

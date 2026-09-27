@@ -2,12 +2,42 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, BarChart3, CheckCircle2, Clock3, Eye, Link2, MousePointerClick, Sparkles, UserRound } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  CheckCircle2,
+  Clock3,
+  Eye,
+  Link2,
+  MousePointerClick,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
 
-type Event = { event_type: string; target: string | null; created_at: string; metadata: Record<string, any> | null; card_id: string | null; nfc_cards?: { label: string | null; card_uid: string }[] | null };
-const ranges = [{ label: "7 days", days: 7 }, { label: "30 days", days: 30 }, { label: "90 days", days: 90 }];
-const labels: Record<string, string> = { view: "Profile views", link_click: "Link clicks", contact_save: "Contact saves", nfc_tap: "NFC taps", qr_scan: "QR scans", event_checkin: "Event check-ins", attendance_scan: "Attendance scans", menu_view: "Menu views" };
+type Event = {
+  event_type: string;
+  target: string | null;
+  created_at: string;
+  metadata: Record<string, any> | null;
+  card_id: string | null;
+  nfc_cards?: { label: string | null; card_uid: string }[] | null;
+};
+const ranges = [
+  { label: "7 days", days: 7 },
+  { label: "30 days", days: 30 },
+  { label: "90 days", days: 90 },
+];
+const labels: Record<string, string> = {
+  view: "Profile views",
+  link_click: "Link clicks",
+  contact_save: "Contact saves",
+  nfc_tap: "NFC taps",
+  qr_scan: "QR scans",
+  event_checkin: "Event check-ins",
+  attendance_scan: "Attendance scans",
+  menu_view: "Menu views",
+};
 
 export default function AnalyticsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -15,17 +45,301 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [ai, setAi] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  useEffect(() => { (async () => { const s = createClient(); const { data: { user } } = await s.auth.getUser(); if (user) { const { data } = await s.from("engagement_events").select("event_type,target,created_at,metadata,card_id,nfc_cards(label,card_uid)").eq("profile_id", user.id).order("created_at", { ascending: false }).limit(1000); setEvents((data || []) as Event[]); } setLoading(false); })(); }, []);
-  const visible = useMemo(() => { const cutoff = Date.now() - days * 86400000; return events.filter((event) => new Date(event.created_at).getTime() >= cutoff); }, [events, days]);
-  const counts = useMemo(() => visible.reduce((result, event) => { result[event.event_type] = (result[event.event_type] || 0) + 1; return result; }, {} as Record<string, number>), [visible]);
+  useEffect(() => {
+    (async () => {
+      const s = createClient();
+      const {
+        data: { user },
+      } = await s.auth.getUser();
+      if (user) {
+        const { data } = await s
+          .from("engagement_events")
+          .select(
+            "event_type,target,created_at,metadata,card_id,nfc_cards(label,card_uid)",
+          )
+          .eq("profile_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1000);
+        setEvents((data || []) as Event[]);
+      }
+      setLoading(false);
+    })();
+  }, []);
+  const visible = useMemo(() => {
+    const cutoff = Date.now() - days * 86400000;
+    return events.filter(
+      (event) => new Date(event.created_at).getTime() >= cutoff,
+    );
+  }, [events, days]);
+  const counts = useMemo(
+    () =>
+      visible.reduce(
+        (result, event) => {
+          result[event.event_type] = (result[event.event_type] || 0) + 1;
+          return result;
+        },
+        {} as Record<string, number>,
+      ),
+    [visible],
+  );
   const views = counts.view || 0;
   const actions = (counts.link_click || 0) + (counts.contact_save || 0);
   const actionRate = views ? Math.round((actions / views) * 100) : 0;
-  const topTargets = useMemo(() => Object.entries(visible.filter((event) => event.target).reduce((result, event) => { const target = event.target as string; result[target] = (result[target] || 0) + 1; return result; }, {} as Record<string, number>)).sort((a, b) => b[1] - a[1]).slice(0, 5), [visible]);
-  const trend = useMemo(() => { const result = Array.from({ length: 7 }, (_, index) => ({ label: new Date(Date.now() - (6 - index) * 86400000).toLocaleDateString(undefined, { weekday: "short" }), count: 0 })); visible.forEach((event) => { const difference = Math.floor((Date.now() - new Date(event.created_at).getTime()) / 86400000); if (difference >= 0 && difference < 7) result[6 - difference].count += 1; }); return result; }, [visible]);
-  async function insights() { setAiLoading(true); const response = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "analytics" }) }); const data = await response.json(); setAi(response.ok ? data.answer : data.error || "Unable to generate insights."); setAiLoading(false); }
-  return <main className="min-h-screen py-10"><div className="container-page"><Link href="/experiences" className="inline-flex items-center gap-2 text-sm font-semibold text-coral-600"><ArrowLeft size={15} /> Experiences</Link><div className="mt-5 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="text-sm font-bold text-coral-600">EXPERIENCE · ANALYTICS</p><h1 className="text-3xl font-black">Engagement intelligence</h1><p className="mt-2 max-w-2xl text-slate-500">Understand how people discover, explore and act on your Connectora identity.</p></div><div className="flex gap-2"><div className="flex rounded-xl border bg-white p-1">{ranges.map((range) => <button key={range.days} onClick={() => setDays(range.days)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${days === range.days ? "bg-slate-950 text-white" : "text-slate-500"}`}>{range.label}</button>)}</div><button onClick={insights} disabled={aiLoading} className="btn-primary gap-2"><Sparkles size={16} />{aiLoading ? "Thinking…" : "Ask AI"}</button></div></div><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric icon={<BarChart3 />} label="Total interactions" value={loading ? "…" : String(visible.length)} /><Metric icon={<Eye />} label="Profile views" value={String(views)} /><Metric icon={<MousePointerClick />} label="Meaningful actions" value={String(actions)} /><Metric icon={<CheckCircle2 />} label="Action rate" value={`${actionRate}%`} /></div>{ai && <div className="card mt-6 border-coral-100 bg-coral-50 p-6"><div className="flex items-center gap-2 font-bold text-coral-800"><Sparkles size={16} /> AI insights</div><p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-coral-950/80">{ai}</p></div>}<div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_.65fr]"><section className="card p-6"><div className="flex items-center justify-between"><div><h2 className="text-xl font-bold">Activity over time</h2><p className="mt-1 text-sm text-slate-500">Interactions during the last 7 days.</p></div><Clock3 className="text-coral-600" size={20} /></div><div className="mt-8 flex h-44 items-end gap-3">{trend.map((day) => <div key={day.label} className="flex flex-1 flex-col items-center gap-2"><div className="flex h-32 w-full items-end"><div className="w-full rounded-t-lg bg-coral-500 transition-all" style={{ height: `${Math.max(day.count ? (day.count / Math.max(...trend.map((item) => item.count), 1)) * 100 : 5, 5)}%` }} title={`${day.count} interactions`} /></div><span className="text-xs text-slate-500">{day.label}</span></div>)}</div></section><section className="card p-6"><h2 className="text-xl font-bold">What people open</h2><p className="mt-1 text-sm text-slate-500">Top destinations from your profile.</p><div className="mt-5 space-y-4">{topTargets.length ? topTargets.map(([target, count]) => <div key={target}><div className="flex justify-between gap-3 text-sm"><span className="truncate font-semibold">{target}</span><span className="text-slate-500">{count}</span></div><div className="mt-2 h-2 rounded-full bg-slate-100"><div className="h-2 rounded-full bg-ink-900" style={{ width: `${(count / topTargets[0][1]) * 100}%` }} /></div></div>) : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">Link clicks will appear here as people interact with your profile.</p>}</div></section></div><section className="card mt-6 p-6"><div className="flex items-center justify-between"><div><h2 className="text-xl font-bold">Recent activity</h2><p className="mt-1 text-sm text-slate-500">A live timeline of your latest interactions.</p></div><UserRound className="text-coral-600" size={20} /></div><div className="mt-5 divide-y">{visible.slice(0, 12).map((event, index) => { const card = Array.isArray(event.nfc_cards) ? event.nfc_cards[0] : event.nfc_cards; return <div key={`${event.created_at}-${index}`} className="flex items-center justify-between gap-4 py-3"><div className="flex min-w-0 items-center gap-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-coral-50 text-coral-700"><ActivityIcon type={event.event_type} /></span><div className="min-w-0"><p className="font-semibold">{labels[event.event_type] || event.event_type.replaceAll("_", " ")}</p><p className="truncate text-xs text-slate-500">{event.target || card?.label || card?.card_uid || "Connectora profile"}</p></div></div><time className="shrink-0 text-xs text-slate-400">{new Date(event.created_at).toLocaleString()}</time></div>; })}{!visible.length && <p className="py-5 text-sm text-slate-500">No activity in this period yet.</p>}</div></section></div></main>;
+  const topTargets = useMemo(
+    () =>
+      Object.entries(
+        visible
+          .filter((event) => event.target)
+          .reduce(
+            (result, event) => {
+              const target = event.target as string;
+              result[target] = (result[target] || 0) + 1;
+              return result;
+            },
+            {} as Record<string, number>,
+          ),
+      )
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5),
+    [visible],
+  );
+  const trend = useMemo(() => {
+    const result = Array.from({ length: 7 }, (_, index) => ({
+      label: new Date(Date.now() - (6 - index) * 86400000).toLocaleDateString(
+        undefined,
+        { weekday: "short" },
+      ),
+      count: 0,
+    }));
+    visible.forEach((event) => {
+      const difference = Math.floor(
+        (Date.now() - new Date(event.created_at).getTime()) / 86400000,
+      );
+      if (difference >= 0 && difference < 7) result[6 - difference].count += 1;
+    });
+    return result;
+  }, [visible]);
+  async function insights() {
+    setAiLoading(true);
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "analytics" }),
+    });
+    const data = await response.json();
+    setAi(
+      response.ok ? data.answer : data.error || "Unable to generate insights.",
+    );
+    setAiLoading(false);
+  }
+  return (
+    <main className="min-h-screen py-10">
+      <div className="container-page">
+        <Link
+          href="/experiences"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-coral-600"
+        >
+          <ArrowLeft size={15} /> Experiences
+        </Link>
+        <div className="mt-5 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <p className="text-sm font-bold text-coral-600">
+              EXPERIENCE · ANALYTICS
+            </p>
+            <h1 className="text-3xl font-black">Engagement intelligence</h1>
+            <p className="mt-2 max-w-2xl text-slate-500">
+              Understand how people discover, explore and act on your Connectora
+              identity.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex rounded-xl border bg-white p-1">
+              {ranges.map((range) => (
+                <button
+                  key={range.days}
+                  onClick={() => setDays(range.days)}
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold ${days === range.days ? "bg-slate-950 text-white" : "text-slate-500"}`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={insights}
+              disabled={aiLoading}
+              className="btn-primary gap-2"
+            >
+              <Sparkles size={16} />
+              {aiLoading ? "Thinking…" : "Ask AI"}
+            </button>
+          </div>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Metric
+            icon={<BarChart3 />}
+            label="Total interactions"
+            value={loading ? "…" : String(visible.length)}
+          />
+          <Metric icon={<Eye />} label="Profile views" value={String(views)} />
+          <Metric
+            icon={<MousePointerClick />}
+            label="Meaningful actions"
+            value={String(actions)}
+          />
+          <Metric
+            icon={<CheckCircle2 />}
+            label="Action rate"
+            value={`${actionRate}%`}
+          />
+        </div>
+        {ai && (
+          <div className="card mt-6 border-coral-100 bg-coral-50 p-6">
+            <div className="flex items-center gap-2 font-bold text-coral-800">
+              <Sparkles size={16} /> AI insights
+            </div>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-coral-950/80">
+              {ai}
+            </p>
+          </div>
+        )}
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
+          <section className="card p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold">Activity over time</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Interactions during the last 7 days.
+                </p>
+              </div>
+              <Clock3 className="text-coral-600" size={20} />
+            </div>
+            <div className="mt-8 flex h-44 items-end gap-3">
+              {trend.map((day) => (
+                <div
+                  key={day.label}
+                  className="flex flex-1 flex-col items-center gap-2"
+                >
+                  <div className="flex h-32 w-full items-end">
+                    <div
+                      className="w-full rounded-t-lg bg-coral-500 transition-all"
+                      style={{
+                        height: `${Math.max(day.count ? (day.count / Math.max(...trend.map((item) => item.count), 1)) * 100 : 5, 5)}%`,
+                      }}
+                      title={`${day.count} interactions`}
+                    />
+                  </div>
+                  <span className="text-xs text-slate-500">{day.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="card p-6">
+            <h2 className="text-xl font-bold">What people open</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Top destinations from your profile.
+            </p>
+            <div className="mt-5 space-y-4">
+              {topTargets.length ? (
+                topTargets.map(([target, count]) => (
+                  <div key={target}>
+                    <div className="flex justify-between gap-3 text-sm">
+                      <span className="truncate font-semibold">{target}</span>
+                      <span className="text-slate-500">{count}</span>
+                    </div>
+                    <div className="mt-2 h-2 rounded-full bg-slate-100">
+                      <div
+                        className="h-2 rounded-full bg-ink-900"
+                        style={{
+                          width: `${(count / topTargets[0][1]) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                  Link clicks will appear here as people interact with your
+                  profile.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+        <section className="card mt-6 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold">Recent activity</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                A live timeline of your latest interactions.
+              </p>
+            </div>
+            <UserRound className="text-coral-600" size={20} />
+          </div>
+          <div className="mt-5 divide-y">
+            {visible.slice(0, 12).map((event, index) => {
+              const card = Array.isArray(event.nfc_cards)
+                ? event.nfc_cards[0]
+                : event.nfc_cards;
+              return (
+                <div
+                  key={`${event.created_at}-${index}`}
+                  className="flex items-center justify-between gap-4 py-3"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-coral-50 text-coral-700">
+                      <ActivityIcon type={event.event_type} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-semibold">
+                        {labels[event.event_type] ||
+                          event.event_type.replaceAll("_", " ")}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">
+                        {event.target ||
+                          card?.label ||
+                          card?.card_uid ||
+                          "Connectora profile"}
+                      </p>
+                    </div>
+                  </div>
+                  <time className="shrink-0 text-xs text-slate-400">
+                    {new Date(event.created_at).toLocaleString()}
+                  </time>
+                </div>
+              );
+            })}
+            {!visible.length && (
+              <p className="py-5 text-sm text-slate-500">
+                No activity in this period yet.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 }
 
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="card p-5"><div className="text-coral-600">{icon}</div><p className="mt-4 text-sm text-slate-500">{label}</p><p className="mt-1 text-3xl font-black">{value}</p></div>; }
-function ActivityIcon({ type }: { type: string }) { if (type === "view") return <Eye size={16} />; if (type === "link_click") return <MousePointerClick size={16} />; if (type === "contact_save") return <UserRound size={16} />; return <Link2 size={16} />; }
+function Metric({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="card p-5">
+      <div className="text-coral-600">{icon}</div>
+      <p className="mt-4 text-sm text-slate-500">{label}</p>
+      <p className="mt-1 text-3xl font-black">{value}</p>
+    </div>
+  );
+}
+function ActivityIcon({ type }: { type: string }) {
+  if (type === "view") return <Eye size={16} />;
+  if (type === "link_click") return <MousePointerClick size={16} />;
+  if (type === "contact_save") return <UserRound size={16} />;
+  return <Link2 size={16} />;
+}

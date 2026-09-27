@@ -91,7 +91,9 @@ export default function ProfileClient({
     ["TikTok", profile?.tiktok, ExternalLink],
     ["GitHub", profile.github, Github],
   ].filter((x) => x[1]);
-  const links = (profile.link_items || []).filter((link) => link?.title && link?.url);
+  const links = (profile.link_items || []).filter(
+    (link) => link?.title && link?.url,
+  );
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8">
       <div className="mx-auto max-w-md overflow-hidden rounded-[2rem] bg-white shadow-xl">
@@ -162,7 +164,14 @@ export default function ProfileClient({
           </div>
           <div className="mt-7 space-y-3 text-left">
             {links.map((link) => (
-              <a key={`${link.title}-${link.url}`} href={normalizeUrl(link.url)} target="_blank" rel="noopener noreferrer" onClick={() => click(link.title)} className="flex items-center justify-between rounded-xl bg-slate-950 p-4 text-white shadow-sm">
+              <a
+                key={`${link.title}-${link.url}`}
+                href={normalizeUrl(link.url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => click(link.title)}
+                className="flex items-center justify-between rounded-xl bg-slate-950 p-4 text-white shadow-sm"
+              >
                 <span className="font-semibold">{link.title}</span>
                 <ExternalLink size={16} className="text-white/60" />
               </a>

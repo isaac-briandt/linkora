@@ -41,7 +41,9 @@ export default function PersonProfileForm({
   initialCards: Card[];
 }) {
   const [form, setForm] = useState<Person>(person);
-  const [links, setLinks] = useState<{ title: string; url: string }[]>(person.link_items || []);
+  const [links, setLinks] = useState<{ title: string; url: string }[]>(
+    person.link_items || [],
+  );
   const [cards, setCards] = useState(initialCards);
   const [cardId, setCardId] = useState("");
   const [saving, setSaving] = useState(false);
@@ -60,7 +62,9 @@ export default function PersonProfileForm({
     editable.full_name = form.full_name || "";
     editable.avatar_url = form.avatar_url || null;
     editable.cover_image_url = form.cover_image_url || null;
-    editable.link_items = links.filter((link) => link.title.trim() && link.url.trim());
+    editable.link_items = links.filter(
+      (link) => link.title.trim() && link.url.trim(),
+    );
     const { error } = await createClient()
       .from("people")
       .update(editable)
@@ -229,11 +233,66 @@ export default function PersonProfileForm({
           </div>
           <div className="mt-8 border-t pt-6">
             <h2 className="text-xl font-bold">Featured links</h2>
-            <p className="mt-1 text-sm text-slate-500">Add the links this person wants to share first.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Add the links this person wants to share first.
+            </p>
             <div className="mt-4 space-y-3">
-              {links.map((link, index) => <div key={index} className="grid gap-3 sm:grid-cols-[.8fr_1.2fr_auto]"><input className="input" value={link.title} placeholder="Button title" onChange={(event) => setLinks((current) => current.map((item, i) => i === index ? { ...item, title: event.target.value } : item))} /><input className="input" value={link.url} placeholder="https://example.com" onChange={(event) => setLinks((current) => current.map((item, i) => i === index ? { ...item, url: event.target.value } : item))} /><button type="button" className="text-sm font-semibold text-red-600" onClick={() => setLinks((current) => current.filter((_, i) => i !== index))}>Remove</button></div>)}
+              {links.map((link, index) => (
+                <div
+                  key={index}
+                  className="grid gap-3 sm:grid-cols-[.8fr_1.2fr_auto]"
+                >
+                  <input
+                    className="input"
+                    value={link.title}
+                    placeholder="Button title"
+                    onChange={(event) =>
+                      setLinks((current) =>
+                        current.map((item, i) =>
+                          i === index
+                            ? { ...item, title: event.target.value }
+                            : item,
+                        ),
+                      )
+                    }
+                  />
+                  <input
+                    className="input"
+                    value={link.url}
+                    placeholder="https://example.com"
+                    onChange={(event) =>
+                      setLinks((current) =>
+                        current.map((item, i) =>
+                          i === index
+                            ? { ...item, url: event.target.value }
+                            : item,
+                        ),
+                      )
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="text-sm font-semibold text-red-600"
+                    onClick={() =>
+                      setLinks((current) =>
+                        current.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
             </div>
-            <button type="button" className="btn-secondary mt-4" onClick={() => setLinks((current) => [...current, { title: "", url: "" }])}>Add link</button>
+            <button
+              type="button"
+              className="btn-secondary mt-4"
+              onClick={() =>
+                setLinks((current) => [...current, { title: "", url: "" }])
+              }
+            >
+              Add link
+            </button>
           </div>
         </div>
         <section className="mt-6 card p-6">

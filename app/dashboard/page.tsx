@@ -44,7 +44,9 @@ export default async function Dashboard() {
         <div className="container-page flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
           <Link href="/" className="inline-flex items-center gap-2">
             <BrandMark />
-            <span className="text-xl font-black tracking-tight">Connectora</span>
+            <span className="text-xl font-black tracking-tight">
+              Connectora
+            </span>
           </Link>
           <div className="flex flex-wrap gap-2">
             <Link href="/ai" className="btn-secondary gap-2">
@@ -205,9 +207,7 @@ function Pillar({
       className="card group p-7 transition hover:-translate-y-1"
     >
       <div className="flex items-center justify-between">
-        <div className="rounded-2xl bg-coral-50 p-3 text-coral-700">
-          {icon}
-        </div>
+        <div className="rounded-2xl bg-coral-50 p-3 text-coral-700">{icon}</div>
         <ArrowRight
           size={18}
           className="text-slate-300 group-hover:text-coral-600"
