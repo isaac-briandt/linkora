@@ -21,11 +21,16 @@ export default function InviteUserForm() {
         body: JSON.stringify({ email }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "The invitation could not be sent.");
+      if (!response.ok)
+        throw new Error(result.error || "The invitation could not be sent.");
       setMessage(result.message);
       setEmail("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The invitation could not be sent.");
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "The invitation could not be sent.",
+      );
     } finally {
       setLoading(false);
     }
@@ -35,7 +40,8 @@ export default function InviteUserForm() {
     <section className="card mt-8 p-6">
       <h2 className="text-xl font-bold">Invite a seller</h2>
       <p className="mt-1 text-sm leading-6 text-slate-500">
-        Send an invitation link. The recipient will choose their own password before accessing Connectora.
+        Send an invitation link. The recipient will choose their own password
+        before accessing Connectora.
       </p>
       <form onSubmit={submit} className="mt-4 flex flex-col gap-3 sm:flex-row">
         <input
@@ -52,8 +58,16 @@ export default function InviteUserForm() {
           {loading ? "Sending…" : "Send invitation"}
         </button>
       </form>
-      {message && <p role="status" className="mt-3 text-sm text-emerald-700">{message}</p>}
-      {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
+      {message && (
+        <p role="status" className="mt-3 text-sm text-emerald-700">
+          {message}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
     </section>
   );
 }

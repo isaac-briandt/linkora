@@ -25,7 +25,10 @@ export default async function AdminPage() {
     .select("profile_id")
     .eq("profile_id", user.id)
     .maybeSingle();
-  if (!["platform_admin", "super_admin"].includes(me?.role || "") && !adminMembership) {
+  if (
+    !["platform_admin", "super_admin"].includes(me?.role || "") &&
+    !adminMembership
+  ) {
     return (
       <main className="min-h-screen grid place-items-center p-6">
         <div className="card max-w-md p-8 text-center">
