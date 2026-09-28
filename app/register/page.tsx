@@ -1,98 +1,28 @@
-"use client";
-import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/browser";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    const { error } = await createClient().auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    });
-    if (error) setError(error.message);
-    else setDone(true);
-    setLoading(false);
-  }
-  if (done)
-    return (
-      <main className="min-h-screen grid place-items-center p-5">
-        <div className="card max-w-md p-8 text-center">
-          <h1 className="text-2xl font-black">Check your email</h1>
-          <p className="mt-3 text-slate-600">
-            Confirm your account, then log in to create your profile.
-          </p>
-          <Link href="/login" className="btn-primary mt-6">
-            Go to login
+  return (
+    <main className="min-h-screen grid place-items-center bg-[#f8f8f4] p-5">
+      <div className="card w-full max-w-lg p-8 text-center">
+        <Link href="/" className="text-xl font-black text-ink-950">
+          Connectora
+        </Link>
+        <p className="mt-8 text-sm font-bold uppercase tracking-wider text-coral-600">
+          Membership by request
+        </p>
+        <h1 className="mt-2 text-3xl font-black">Let’s get you connected.</h1>
+        <p className="mt-3 leading-7 text-slate-600">
+          Connectora accounts are currently created by invitation. Contact us
+          for a digital card or to ask about becoming a digital card seller.
+        </p>
+        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/contact" className="btn-primary">
+            Contact Connectora
+          </Link>
+          <Link href="/login" className="btn-secondary">
+            Already have an account? Log in
           </Link>
         </div>
-      </main>
-    );
-  return (
-    <main className="min-h-screen grid place-items-center p-5">
-      <div className="card w-full max-w-md p-8">
-        <Link href="/" className="text-xl font-black">
-          connectora
-        </Link>
-        <h1 className="mt-8 text-3xl font-black">Create your identity</h1>
-        <form onSubmit={submit} className="mt-7 space-y-4">
-          <div>
-            <label className="label">Full name</label>
-            <input
-              className="input"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="label">Email</label>
-            <input
-              className="input"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="label">Password</label>
-            <input
-              className="input"
-              type="password"
-              minLength={6}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          {error && (
-            <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-          <button className="btn-primary w-full" disabled={loading}>
-            {loading ? "Creating…" : "Create account"}
-          </button>
-        </form>
-        <p className="mt-6 text-center text-sm text-slate-600">
-          Already registered?{" "}
-          <Link className="font-semibold text-coral-600" href="/login">
-            Log in
-          </Link>
-        </p>
       </div>
     </main>
   );

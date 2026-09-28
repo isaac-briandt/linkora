@@ -66,6 +66,10 @@ Set `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in `.env.local`.
 5. Run `pnpm install`.
 6. Run `pnpm dev`.
 
+## Inviting users
+
+Public sign-up is intentionally disabled. Platform administrators can invite sellers from `/admin`; invited users receive an email link and choose their own password on `/auth/set-password`. Set `SUPABASE_SERVICE_ROLE_KEY` in the server's `.env.local` or hosting environment (never expose it with a `NEXT_PUBLIC_` prefix), and add the deployed `/auth/set-password` URL to Supabase Authentication → URL Configuration → Redirect URLs. Set `NEXT_PUBLIC_APP_URL` to the canonical app origin so invitation links use the correct domain.
+
 ## NFC model
 
 Connectora does not need to read the physical chip UID in the browser. Register a Connectora `card_uid` and write the stable URL `/c/[cardUid]` to the NFC tag. The resolver can then point the card to a profile or other experience without rewriting the tag.

@@ -61,9 +61,9 @@ export default function Login() {
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-600">
-          No account?{" "}
-          <Link className="font-semibold text-coral-600" href="/register">
-            Create one
+          Need an account?{" "}
+          <Link className="font-semibold text-coral-600" href="/contact">
+            Contact us
           </Link>
         </p>
       </div>

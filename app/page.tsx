@@ -72,8 +72,8 @@ export default function Home() {
             >
               Log in
             </Link>
-            <Link href="/register" className="btn-primary px-4 py-2.5 text-sm">
-              Create your Connectora
+            <Link href="/contact" className="btn-primary px-4 py-2.5 text-sm">
+              Get Started
             </Link>
           </div>
         </div>
@@ -94,8 +94,8 @@ export default function Home() {
               links, contact details, work and real-world connections.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Link href="/register" className="btn-primary gap-2 px-5 py-3.5">
-                Start for free <ArrowRight size={18} />
+              <Link href="/contact" className="btn-primary gap-2 px-5 py-3.5">
+                Get a digital card <ArrowRight size={18} />
               </Link>
               <Link
                 href="/people"
@@ -177,10 +177,10 @@ export default function Home() {
               </h2>
             </div>
             <Link
-              href="/register"
+              href="/contact"
               className="inline-flex items-center gap-2 text-sm font-bold text-coral-600"
             >
-              Explore Connectora <ArrowRight size={16} />
+              Get in touch <ArrowRight size={16} />
             </Link>
           </div>
           <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
@@ -236,7 +236,7 @@ export default function Home() {
           <p>One identity. Every connection.</p>
           <div className="flex gap-4 font-semibold">
             <Link href="/login">Log in</Link>
-            <Link href="/register">Get started</Link>
+            <Link href="/contact">Contact us</Link>
           </div>
         </div>
       </footer>

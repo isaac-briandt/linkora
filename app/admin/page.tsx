@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import InviteUserForm from "./invite-user-form";
 export default async function AdminPage() {
   const s = await createClient();
   const {
@@ -19,7 +20,12 @@ export default async function AdminPage() {
     .select("role,full_name")
     .eq("id", user.id)
     .single();
-  if (!["platform_admin", "super_admin"].includes(me?.role || "")) {
+  const { data: adminMembership } = await s
+    .from("platform_admins")
+    .select("profile_id")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+  if (!["platform_admin", "super_admin"].includes(me?.role || "") && !adminMembership) {
     return (
       <main className="min-h-screen grid place-items-center p-6">
         <div className="card max-w-md p-8 text-center">
@@ -86,6 +92,7 @@ export default async function AdminPage() {
             value={String(events || 0)}
           />
         </div>
+        <InviteUserForm />
         <div className="card mt-8 overflow-hidden">
           <div className="border-b p-6">
             <h2 className="text-xl font-bold">Recent organizations</h2>
