@@ -5,10 +5,13 @@ import {
   Building2,
   Check,
   ExternalLink,
+  Eye,
+  LockKeyhole,
   Link2,
   Menu,
   QrCode,
   Sparkles,
+  ShieldCheck,
   Users,
   Wifi,
 } from "lucide-react";
@@ -64,6 +67,9 @@ export default function Home() {
             <a href="#how-it-works" className="transition hover:text-coral-600">
               How it works
             </a>
+            <a href="#privacy" className="transition hover:text-coral-600">
+              Privacy
+            </a>
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -105,11 +111,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-ink-600">
-              {[
-                "No design skills needed",
-                "NFC and QR ready",
-                "Made for people and teams",
-              ].map((item) => (
+              {["NFC and QR ready", "Made for people and teams"].map((item) => (
                 <span key={item} className="inline-flex items-center gap-2">
                   <Check size={15} className="text-coral-600" />
                   {item}
@@ -200,6 +202,67 @@ export default function Home() {
       </section>
 
       <section
+        id="privacy"
+        className="border-b border-ink-900/10 bg-white py-20 sm:py-24"
+      >
+        <div className="container-page">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-coral-50 text-coral-700">
+              <ShieldCheck size={28} />
+            </div>
+            <p className="mt-6 text-sm font-bold uppercase tracking-[0.16em] text-coral-600">
+              Your information matters
+            </p>
+            <h2 className="mt-3 font-serif text-4xl font-black leading-tight tracking-[-0.04em] text-ink-950 sm:text-5xl">
+              Share confidently. Stay in control.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-ink-600">
+              Your digital card is made to be shared, but you choose what goes
+              on it. We use sign-in controls and database access rules to help
+              protect account and workspace tools.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 grid max-w-4xl gap-5 md:grid-cols-2">
+            <div className="rounded-2xl border border-ink-900/10 bg-[#f8f8f4] p-6">
+              <div className="flex items-center gap-3">
+                <Eye className="shrink-0 text-coral-700" size={21} />
+                <h3 className="font-black text-ink-950">
+                  You choose what to share
+                </h3>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-ink-600">
+                Public profile details can be seen by people who visit your
+                profile. Only add information you’re comfortable sharing; keep
+                passwords and sensitive personal data off your card.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-ink-900/10 bg-[#f8f8f4] p-6">
+              <div className="flex items-center gap-3">
+                <LockKeyhole className="shrink-0 text-coral-700" size={21} />
+                <h3 className="font-black text-ink-950">
+                  Workspace tools require sign-in
+                </h3>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-ink-600">
+                Account and organization tools are for signed-in users, with
+                database rules that limit who can manage workspace information.
+              </p>
+            </div>
+          </div>
+          <p className="mt-8 text-center text-sm text-ink-600">
+            Have a privacy or security question?{" "}
+            <Link
+              href="/contact"
+              className="font-bold text-coral-700 hover:underline"
+            >
+              Talk to us
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
+      <section
         id="teams"
         className="border-b border-ink-900/10 bg-coral-500 py-20 text-white sm:py-24"
       >
@@ -226,17 +289,22 @@ export default function Home() {
       </section>
 
       <footer className="bg-[#f8f8f4] py-8">
-        <div className="container-page flex flex-col gap-4 text-sm text-ink-600 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-black text-ink-950"
-          >
-            <BrandMark /> Connectora
-          </Link>
-          <p>One identity. Every connection.</p>
-          <div className="flex gap-4 font-semibold">
-            <Link href="/login">Log in</Link>
-            <Link href="/contact">Contact us</Link>
+        <div className="container-page flex flex-col gap-5 text-sm text-ink-600">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 font-black text-ink-950"
+            >
+              <BrandMark /> Connectora
+            </Link>
+            <p>One identity. Every connection.</p>
+            <div className="flex gap-4 font-semibold">
+              <Link href="/login">Log in</Link>
+              <Link href="/contact">Contact us</Link>
+            </div>
+          </div>
+          <div className="flex flex-col sm:gap-4 border-t border-ink-900/10 pt-4 sm:flex-row sm:items-center justify-center">
+            <p>© 2026 Connectora. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -247,7 +315,7 @@ export default function Home() {
 function ProfilePreview() {
   return (
     <div className="relative mx-auto w-full max-w-[430px] md:mr-2">
-      <div className="absolute -left-8 top-20 hidden -rotate-6 rounded-xl border border-ink-900/10 bg-white px-4 py-3 text-xs font-bold text-ink-700 shadow-xl sm:block">
+      <div className="absolute -left-8 top-20 z-20 hidden -rotate-6 rounded-xl border border-ink-900/10 bg-white px-4 py-3 text-xs font-bold text-ink-700 shadow-xl sm:block">
         Tap to connect <Wifi size={14} className="ml-2 inline text-coral-600" />
       </div>
       <div className="relative rounded-[2rem] border border-ink-900/10 bg-white p-3 shadow-[0_28px_70px_rgba(11,31,51,.16)]">

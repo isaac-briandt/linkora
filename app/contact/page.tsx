@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Store } from "lucide-react";
+import { ArrowLeft, CreditCard, MessageCircle, Store } from "lucide-react";
 
 const contactEmail = "info@connectora.io";
+const whatsappNumber = "233505489884";
 
 function enquiryLink(subject: string, request: string) {
   const body = `Hello Connectora,\n\n${request}\n\nName:\nPhone (optional):\n`;
@@ -26,8 +27,8 @@ export default function Contact() {
             How would you like to connect?
           </h1>
           <p className="mt-3 max-w-2xl leading-7 text-slate-600">
-            Tell us what you need. We’ll help you get a digital card or discuss
-            access to sell Connectora cards.
+            Choose a digital card or a seller account. Reach out with your
+            selection and we’ll help you get started.
           </p>
         </div>
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -35,14 +36,17 @@ export default function Contact() {
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-coral-50 text-coral-700">
               <CreditCard size={23} />
             </div>
-            <h2 className="mt-5 text-xl font-black">I want a digital card</h2>
+            <h2 className="mt-5 text-xl font-black">Digital card</h2>
+            <p className="mt-2 text-3xl font-black text-coral-700">$26</p>
+            <p className="text-sm font-semibold text-slate-500">one-time</p>
             <p className="mt-2 min-h-12 text-sm leading-6 text-slate-600">
-              Request a card for your personal or professional profile.
+              Your digital card includes a dashboard to track engagement
+              analytics.
             </p>
             <a
               href={enquiryLink(
                 "Digital card request",
-                "I’m interested in getting a Connectora digital card.",
+                "I’m interested in the $26 Connectora digital card, including its engagement analytics dashboard.",
               )}
               className="btn-primary mt-5 inline-flex"
             >
@@ -53,18 +57,20 @@ export default function Contact() {
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-coral-50 text-coral-700">
               <Store size={23} />
             </div>
-            <h2 className="mt-5 text-xl font-black">I want to sell cards</h2>
+            <h2 className="mt-5 text-xl font-black">Seller account</h2>
+            <p className="mt-2 text-3xl font-black text-coral-700">$35</p>
+            <p className="text-sm font-semibold text-slate-500">per month</p>
             <p className="mt-2 min-h-12 text-sm leading-6 text-slate-600">
-              Ask about becoming a seller and getting a platform account.
+              Get platform account access to sell Connectora digital cards.
             </p>
             <a
               href={enquiryLink(
-                "Card seller enquiry",
-                "I’m interested in becoming a Connectora card seller and would like to learn about platform access.",
+                "Seller account enquiry",
+                "I’m interested in the Connectora seller account at $30 per month, to access the platform and sell digital cards.",
               )}
               className="btn-secondary mt-5 inline-flex"
             >
-              Ask about selling
+              Ask about a seller account
             </a>
           </section>
         </div>
@@ -78,6 +84,17 @@ export default function Contact() {
           </a>
           .
         </p>
+        <div className="mt-5 text-center">
+          <a
+            href={`https://wa.me/${whatsappNumber}`}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <MessageCircle size={17} /> Chat with us on WhatsApp
+          </a>
+          <p className="mt-2 text-xs text-slate-500">+233 50 548 9884</p>
+        </div>
       </div>
     </main>
   );
