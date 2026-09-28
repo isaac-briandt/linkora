@@ -10,7 +10,13 @@ export const metadata: Metadata = {
       { url: "/brand/connectora-icon.png", type: "image/png" },
     ],
     shortcut: ["/icon.svg"],
-    apple: [{ url: "/brand/connectora-icon.png", type: "image/png", sizes: "1254x1254" }],
+    apple: [
+      {
+        url: "/brand/connectora-icon.png",
+        type: "image/png",
+        sizes: "1254x1254",
+      },
+    ],
   },
 };
 export default function RootLayout({
