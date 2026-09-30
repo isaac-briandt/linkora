@@ -1,7 +1,11 @@
 "use client";
 import { createClient } from "@/lib/supabase/browser";
 
-export default function LogoutButton({ className = "" }: { className?: string }) {
+export default function LogoutButton({
+  className = "",
+}: {
+  className?: string;
+}) {
   return (
     <button
       className={`btn-secondary gap-2 ${className}`}

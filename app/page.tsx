@@ -145,8 +145,8 @@ export default function Home() {
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-8 text-ink-700 sm:text-xl">
               Bring your profile, links and contact details together in one
-              digital business card. Share it online or in person with a URL,
-              QR code or NFC card.
+              digital business card. Share it online or in person with a URL, QR
+              code or NFC card.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/contact" className="btn-primary gap-2 px-5 py-3.5">
@@ -228,14 +228,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="audiences" className="border-b border-ink-900/10 py-20 sm:py-24">
+      <section
+        id="audiences"
+        className="border-b border-ink-900/10 py-20 sm:py-24"
+      >
         <div className="container-page">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral-600">
               One platform, two ways to connect
             </p>
             <h2 className="mt-3 font-serif text-4xl font-black leading-tight tracking-[-0.04em] text-ink-950 sm:text-5xl">
-              Digital business cards for your next introduction—and your whole team.
+              Digital business cards for your next introduction—and your whole
+              team.
             </h2>
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
@@ -243,16 +247,30 @@ export default function Home() {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-coral-50 text-coral-700">
                 <Users size={23} />
               </div>
-              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-600">For individuals</p>
-              <h3 className="mt-2 text-2xl font-black text-ink-950">Create a digital identity that travels with you.</h3>
+              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-600">
+                For individuals
+              </p>
+              <h3 className="mt-2 text-2xl font-black text-ink-950">
+                Create a digital identity that travels with you.
+              </h3>
               <p className="mt-3 leading-7 text-ink-600">
-                Bring your professional profile, social links and contact details together, then share one URL, QR code or NFC card.
+                Bring your professional profile, social links and contact
+                details together, then share one URL, QR code or NFC card.
               </p>
               <ul className="mt-5 space-y-2 text-sm font-medium text-ink-700">
-                <li className="flex items-center gap-2"><Check size={16} className="text-coral-600" /> One profile for your links and work</li>
-                <li className="flex items-center gap-2"><Check size={16} className="text-coral-600" /> Contact saves and engagement analytics</li>
+                <li className="flex items-center gap-2">
+                  <Check size={16} className="text-coral-600" /> One profile for
+                  your links and work
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check size={16} className="text-coral-600" /> Contact saves
+                  and engagement analytics
+                </li>
               </ul>
-              <Link href="/contact" className="btn-primary mt-7 inline-flex items-center gap-2">
+              <Link
+                href="/contact"
+                className="btn-primary mt-7 inline-flex items-center gap-2"
+              >
                 Get your digital card <ArrowRight size={17} />
               </Link>
             </article>
@@ -260,16 +278,30 @@ export default function Home() {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/10 text-coral-300">
                 <Building2 size={23} />
               </div>
-              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-300">For organizations</p>
-              <h3 className="mt-2 text-2xl font-black">Manage identities and experiences at scale.</h3>
+              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-300">
+                For organizations
+              </p>
+              <h3 className="mt-2 text-2xl font-black">
+                Manage identities and experiences at scale.
+              </h3>
               <p className="mt-3 leading-7 text-white/70">
-                Give teams and communities branded profiles, connected cards and practical tools for events, attendance and digital menus.
+                Give teams and communities branded profiles, connected cards and
+                practical tools for events, attendance and digital menus.
               </p>
               <ul className="mt-5 space-y-2 text-sm font-medium text-white/85">
-                <li className="flex items-center gap-2"><Check size={16} className="text-coral-300" /> Manage people and issue connected cards</li>
-                <li className="flex items-center gap-2"><Check size={16} className="text-coral-300" /> Support events, check-ins and menus</li>
+                <li className="flex items-center gap-2">
+                  <Check size={16} className="text-coral-300" /> Manage people
+                  and issue connected cards
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check size={16} className="text-coral-300" /> Support events,
+                  check-ins and menus
+                </li>
               </ul>
-              <Link href="/contact" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-ink-950 transition hover:bg-coral-50">
+              <Link
+                href="/contact"
+                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-ink-950 transition hover:bg-coral-50"
+              >
                 Talk about your team <ArrowRight size={17} />
               </Link>
             </article>
@@ -291,7 +323,9 @@ export default function Home() {
                 See what happens after the share.
               </h2>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-ink-600">
-                A paper card can’t show what people do next. Connectora analytics help you follow profile views, link clicks, contact saves and card taps.
+                A paper card can’t show what people do next. Connectora
+                analytics help you follow profile views, link clicks, contact
+                saves and card taps.
               </p>
             </div>
             <Link
@@ -303,7 +337,10 @@ export default function Home() {
           </div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-2xl border border-ink-900/10 bg-white p-5">
+              <div
+                key={title}
+                className="rounded-2xl border border-ink-900/10 bg-white p-5"
+              >
                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-coral-100 text-coral-700">
                   <Icon size={21} />
                 </div>

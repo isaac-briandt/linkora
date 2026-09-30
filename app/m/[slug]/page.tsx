@@ -81,13 +81,11 @@ export default async function MenuPage({
     }
   }
   if (externalUrl) {
-    await s
-      .from("engagement_events")
-      .insert({
-        event_type: "menu_view",
-        organization_id: menu.organization_id,
-        metadata: { menu_id: menu.id, source: "external_menu" },
-      });
+    await s.from("engagement_events").insert({
+      event_type: "menu_view",
+      organization_id: menu.organization_id,
+      metadata: { menu_id: menu.id, source: "external_menu" },
+    });
     redirect(externalUrl.toString());
   }
 
@@ -105,13 +103,11 @@ export default async function MenuPage({
         .eq("available", true)
         .order("sort_order")
     : { data: [] };
-  await s
-    .from("engagement_events")
-    .insert({
-      event_type: "menu_view",
-      organization_id: menu.organization_id,
-      metadata: { menu_id: menu.id },
-    });
+  await s.from("engagement_events").insert({
+    event_type: "menu_view",
+    organization_id: menu.organization_id,
+    metadata: { menu_id: menu.id },
+  });
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">

@@ -92,7 +92,9 @@ export default function DashboardSidebar() {
           </Link>
           <button
             type="button"
-            aria-label={mobileOpen ? "Close dashboard menu" : "Open dashboard menu"}
+            aria-label={
+              mobileOpen ? "Close dashboard menu" : "Open dashboard menu"
+            }
             aria-expanded={mobileOpen}
             aria-controls="mobile-dashboard-navigation"
             onClick={() => setMobileOpen((open) => !open)}

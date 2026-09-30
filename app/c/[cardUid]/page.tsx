@@ -44,16 +44,14 @@ export default async function CardRoute({
       .single();
     eventProfileId = person?.profile_id || null;
   }
-  await s
-    .from("engagement_events")
-    .insert({
-      event_type: "nfc_tap",
-      card_id: card.id,
-      person_id: card.person_id,
-      profile_id: eventProfileId,
-      organization_id: card.organization_id,
-      metadata: { card_uid: cardUid },
-    });
+  await s.from("engagement_events").insert({
+    event_type: "nfc_tap",
+    card_id: card.id,
+    person_id: card.person_id,
+    profile_id: eventProfileId,
+    organization_id: card.organization_id,
+    metadata: { card_uid: cardUid },
+  });
   const destination = safeExternalUrl(card.destination_url);
   if (destination) redirect(destination);
   if (card.person_id) {

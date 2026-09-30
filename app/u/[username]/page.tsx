@@ -32,7 +32,9 @@ export async function generateMetadata({
   const role = [profile.title, profile.company].filter(Boolean).join(" at ");
   const title = role ? `${name} — ${role}` : `${name} | Digital Profile`;
   const canonical = `/u/${encodeURIComponent(profile.username)}`;
-  const images = profile.avatar_url ? [{ url: profile.avatar_url, alt: name }] : undefined;
+  const images = profile.avatar_url
+    ? [{ url: profile.avatar_url, alt: name }]
+    : undefined;
 
   return {
     title,
@@ -45,7 +47,12 @@ export async function generateMetadata({
       url: canonical,
       images,
     },
-    twitter: { card: "summary", title, description: cleanDescription(profile.bio), images },
+    twitter: {
+      card: "summary",
+      title,
+      description: cleanDescription(profile.bio),
+      images,
+    },
   };
 }
 

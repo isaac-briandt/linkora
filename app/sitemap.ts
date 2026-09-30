@@ -36,7 +36,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const profile of profiles || []) {
     if (!profile.username) continue;
     entries.push({
-      url: new URL(`/u/${encodeURIComponent(profile.username)}`, siteUrl).toString(),
+      url: new URL(
+        `/u/${encodeURIComponent(profile.username)}`,
+        siteUrl,
+      ).toString(),
       changeFrequency: "monthly",
       priority: 0.7,
     });
