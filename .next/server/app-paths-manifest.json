@@ -1,5 +1,10 @@
 {
-  "/icon.svg/route": "app/icon.svg/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js"
+  "/api/events/route": "app/api/events/route.js",
+  "/ai/page": "app/ai/page.js",
+  "/organizations/page": "app/organizations/page.js",
+  "/experiences/page": "app/experiences/page.js",
+  "/u/[username]/page": "app/u/[username]/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/profile/page": "app/dashboard/profile/page.js",
+  "/dashboard/cards/page": "app/dashboard/cards/page.js"
 }

@@ -7,14 +7,11 @@ import {
   BarChart3,
   Plus,
   Users,
-  CalendarCheck,
   Sparkles,
   ArrowRight,
   QrCode,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import BrandMark from "@/components/brand-mark";
-import LogoutButton from "./logout-button";
 export default async function Dashboard() {
   const s = await createClient();
   const {
@@ -40,31 +37,6 @@ export default async function Dashboard() {
     ]);
   return (
     <main className="min-h-screen">
-      <nav className="border-b bg-white">
-        <div className="container-page flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <BrandMark />
-            <span className="text-xl font-black tracking-tight">
-              Connectora
-            </span>
-          </Link>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/ai" className="btn-secondary gap-2">
-              <Sparkles size={16} /> AI
-            </Link>
-            <Link href="/people" className="btn-secondary gap-2">
-              <Users size={16} /> People
-            </Link>
-            <Link href="/organizations" className="btn-secondary gap-2">
-              <Building2 size={16} /> Organizations
-            </Link>
-            <Link href="/experiences" className="btn-secondary gap-2">
-              <QrCode size={16} /> Experiences
-            </Link>
-            <LogoutButton />
-          </div>
-        </div>
-      </nav>
       <div className="container-page py-10">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>

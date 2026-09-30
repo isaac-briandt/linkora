@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ProfileClient from "@/app/u/[username]/profile-client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Personal Profile",
+  robots: { index: false, follow: false },
+};
 
 export default async function OrganizationPersonProfile({
   params,

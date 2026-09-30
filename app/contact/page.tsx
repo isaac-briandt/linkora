@@ -1,5 +1,21 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowLeft, CreditCard, MessageCircle, Store } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Get a Digital Business Card",
+  description:
+    "Explore Connectora digital business cards and seller accounts. Contact our team to get started with a shareable digital profile.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Get a Digital Business Card | Connectora",
+    description:
+      "Contact Connectora to get started with a digital business card or seller account.",
+    url: "/contact",
+  },
+};
 
 const contactEmail = "info@connectora.io";
 const whatsappNumber = "233505489884";

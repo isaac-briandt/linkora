@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import {
   ArrowRight,
   BarChart3,
   Building2,
   Check,
-  ExternalLink,
   Eye,
   LockKeyhole,
   Link2,
@@ -16,6 +17,48 @@ import {
   Wifi,
 } from "lucide-react";
 import BrandMark from "@/components/brand-mark";
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://connectora.io";
+
+export const metadata: Metadata = {
+  title: "Digital Business Cards, NFC & QR Profiles",
+  description:
+    "Create one digital business card for your profile, links and contact details. Share it in person or online with a Connectora URL, QR code or NFC card.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Digital Business Cards, NFC & QR Profiles | Connectora",
+    description:
+      "Bring your digital identity together in one shareable profile. Connectora digital business cards work with QR codes and NFC cards.",
+    url: "/",
+    images: [
+      {
+        url: "/brand/connectora%20hero%20img.png",
+        width: 1774,
+        height: 888,
+        alt: "People sharing a Connectora digital business card",
+      },
+    ],
+  },
+  twitter: {
+    title: "Digital Business Cards, NFC & QR Profiles | Connectora",
+    description:
+      "One shareable digital identity for people and teams, ready for a URL, QR code or NFC card.",
+    images: ["/brand/connectora%20hero%20img.png"],
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Connectora",
+  url: siteUrl,
+  logo: new URL("/brand/connectora-icon.png", siteUrl).toString(),
+  email: "info@connectora.io",
+  description:
+    "Connectora brings digital profiles, links and contact details together in shareable digital business cards for people and teams.",
+};
 
 const profileLinks = [
   { label: "Book a conversation", note: "Calendly", accent: "bg-coral-500" },
@@ -49,6 +92,10 @@ const features = [
 export default function Home() {
   return (
     <main className="overflow-hidden bg-[#f8f8f4] text-ink-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
       <nav className="border-b border-ink-900/10 bg-[#f8f8f4]/90 backdrop-blur">
         <div className="container-page flex h-[76px] items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
@@ -59,10 +106,10 @@ export default function Home() {
           </Link>
           <div className="hidden items-center gap-7 text-sm font-semibold text-ink-700 md:flex">
             <a href="#features" className="transition hover:text-coral-600">
-              Features
+              Analytics
             </a>
-            <a href="#teams" className="transition hover:text-coral-600">
-              For teams
+            <a href="#audiences" className="transition hover:text-coral-600">
+              Who it’s for
             </a>
             <a href="#how-it-works" className="transition hover:text-coral-600">
               How it works
@@ -91,23 +138,25 @@ export default function Home() {
             <p className="mb-6 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.16em] text-coral-600">
               <Sparkles size={16} /> Your digital front door
             </p>
-            <h1 className="max-w-3xl font-serif text-6xl font-black leading-[.94] tracking-[-0.065em] text-ink-950 sm:text-7xl lg:text-[6.8rem]">
-              Everything you are,{" "}
-              <span className="text-coral-600">in one place.</span>
+            <h1 className="max-w-3xl font-serif text-6xl font-black leading-[.98] tracking-[-0.065em] text-ink-950 sm:text-7xl lg:text-[5.2rem]">
+              <span className="block">One digital</span>
+              <span className="block">business card.</span>
+              <span className="block text-coral-600">Every connection.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-8 text-ink-700 sm:text-xl">
-              Connectora gives you one beautiful, shareable profile for your
-              links, contact details, work and real-world connections.
+              Bring your profile, links and contact details together in one
+              digital business card. Share it online or in person with a URL,
+              QR code or NFC card.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/contact" className="btn-primary gap-2 px-5 py-3.5">
                 Get a digital card <ArrowRight size={18} />
               </Link>
               <Link
-                href="/people"
+                href="#audiences"
                 className="btn-secondary gap-2 border-ink-900/20 bg-transparent px-5 py-3.5"
               >
-                See the experience <ExternalLink size={16} />
+                Explore who it’s for <ArrowRight size={16} />
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-ink-600">
@@ -136,7 +185,7 @@ export default function Home() {
                 From profile to presence
               </p>
               <h2 className="mt-4 max-w-md font-serif text-4xl font-black leading-tight tracking-[-0.04em] sm:text-5xl">
-                Share less. Connect more.
+                How your digital business card works.
               </h2>
             </div>
             <p className="max-w-xl text-lg leading-8 text-white/65">
@@ -161,33 +210,100 @@ export default function Home() {
               text="Let people save your contact, follow your work, book time or explore more."
             />
           </div>
+          <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl shadow-black/20">
+            <video
+              className="aspect-video w-full"
+              controls
+              preload="metadata"
+              playsInline
+              aria-label="How Connectora unifies digital identity"
+            >
+              <source
+                src="/brand/How_Connectora_Unifies_Digital_Identity.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video element.
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <section id="audiences" className="border-b border-ink-900/10 py-20 sm:py-24">
+        <div className="container-page">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral-600">
+              One platform, two ways to connect
+            </p>
+            <h2 className="mt-3 font-serif text-4xl font-black leading-tight tracking-[-0.04em] text-ink-950 sm:text-5xl">
+              Digital business cards for your next introduction—and your whole team.
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            <article className="card p-7 sm:p-9">
+              <div className="grid h-12 w-12 place-items-center rounded-xl bg-coral-50 text-coral-700">
+                <Users size={23} />
+              </div>
+              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-600">For individuals</p>
+              <h3 className="mt-2 text-2xl font-black text-ink-950">Create a digital identity that travels with you.</h3>
+              <p className="mt-3 leading-7 text-ink-600">
+                Bring your professional profile, social links and contact details together, then share one URL, QR code or NFC card.
+              </p>
+              <ul className="mt-5 space-y-2 text-sm font-medium text-ink-700">
+                <li className="flex items-center gap-2"><Check size={16} className="text-coral-600" /> One profile for your links and work</li>
+                <li className="flex items-center gap-2"><Check size={16} className="text-coral-600" /> Contact saves and engagement analytics</li>
+              </ul>
+              <Link href="/contact" className="btn-primary mt-7 inline-flex items-center gap-2">
+                Get your digital card <ArrowRight size={17} />
+              </Link>
+            </article>
+            <article className="card !bg-ink-950 p-7 text-white sm:p-9">
+              <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/10 text-coral-300">
+                <Building2 size={23} />
+              </div>
+              <p className="mt-6 text-sm font-bold uppercase tracking-wider text-coral-300">For organizations</p>
+              <h3 className="mt-2 text-2xl font-black">Manage identities and experiences at scale.</h3>
+              <p className="mt-3 leading-7 text-white/70">
+                Give teams and communities branded profiles, connected cards and practical tools for events, attendance and digital menus.
+              </p>
+              <ul className="mt-5 space-y-2 text-sm font-medium text-white/85">
+                <li className="flex items-center gap-2"><Check size={16} className="text-coral-300" /> Manage people and issue connected cards</li>
+                <li className="flex items-center gap-2"><Check size={16} className="text-coral-300" /> Support events, check-ins and menus</li>
+              </ul>
+              <Link href="/contact" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-ink-950 transition hover:bg-coral-50">
+                Talk about your team <ArrowRight size={17} />
+              </Link>
+            </article>
+          </div>
         </div>
       </section>
 
       <section
         id="features"
-        className="border-b border-ink-900/10 py-20 sm:py-24"
+        className="border-b border-ink-900/10 bg-[#f0eee8] py-20 sm:py-24"
       >
         <div className="container-page">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral-600">
-                A better link in bio
+                Beyond the business card
               </p>
               <h2 className="mt-3 max-w-2xl font-serif text-4xl font-black leading-tight tracking-[-0.04em] sm:text-5xl">
-                The simple front door for your digital life.
+                See what happens after the share.
               </h2>
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-ink-600">
+                A paper card can’t show what people do next. Connectora analytics help you follow profile views, link clicks, contact saves and card taps.
+              </p>
             </div>
             <Link
               href="/contact"
               className="inline-flex items-center gap-2 text-sm font-bold text-coral-600"
             >
-              Get in touch <ArrowRight size={16} />
+              Ask about analytics <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon: Icon, title, text }) => (
-              <div key={title}>
+              <div key={title} className="rounded-2xl border border-ink-900/10 bg-white p-5">
                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-coral-100 text-coral-700">
                   <Icon size={21} />
                 </div>
@@ -269,21 +385,22 @@ export default function Home() {
         <div className="container-page grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-white/70">
-              For organizations
+              One platform. Multiple experiences.
             </p>
             <h2 className="mt-4 max-w-2xl font-serif text-4xl font-black leading-tight tracking-[-0.04em] sm:text-5xl">
-              Give every person a profile worth sharing.
+              More than profiles—built around real connections.
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-white/80">
-              Manage people, cards, events, attendance and digital menus from
-              one calm workspace.
+              Connect people with branded profiles and cards, support event
+              check-ins and attendance, publish digital menus, and understand
+              engagement—all from one workspace.
             </p>
           </div>
           <Link
-            href="/organizations/new"
+            href="/contact"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink-950 px-5 py-3.5 font-bold text-white transition hover:bg-ink-800"
           >
-            Build a team workspace <ArrowRight size={18} />
+            Talk to us about teams <ArrowRight size={18} />
           </Link>
         </div>
       </section>
@@ -314,52 +431,59 @@ export default function Home() {
 
 function ProfilePreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[430px] md:mr-2">
-      <div className="absolute -left-8 top-20 z-20 hidden -rotate-6 rounded-xl border border-ink-900/10 bg-white px-4 py-3 text-xs font-bold text-ink-700 shadow-xl sm:block">
-        Tap to connect <Wifi size={14} className="ml-2 inline text-coral-600" />
+    <div className="relative mx-auto w-full max-w-[560px] pb-[300px] md:mr-0">
+      <div className="relative overflow-hidden rounded-[1.75rem] border border-ink-900/10 bg-white p-2 shadow-[0_28px_70px_rgba(11,31,51,.18)] sm:rounded-[2rem] sm:p-3">
+        <Image
+          src="/brand/connectora%20hero%20img.png"
+          alt="People sharing a Connectora digital business card at a networking event"
+          width={1774}
+          height={888}
+          priority
+          sizes="(max-width: 768px) 100vw, 560px"
+          className="aspect-[1.8/1] w-full rounded-[1.25rem] object-cover sm:rounded-[1.5rem]"
+        />
+        <div className="absolute bottom-5 left-5 rounded-xl bg-ink-950/90 px-3 py-2 text-xs font-bold text-white shadow-lg backdrop-blur">
+          <Wifi size={14} className="mr-2 inline text-coral-300" /> Tap to
+          connect
+        </div>
       </div>
-      <div className="relative rounded-[2rem] border border-ink-900/10 bg-white p-3 shadow-[0_28px_70px_rgba(11,31,51,.16)]">
-        <div className="overflow-hidden rounded-[1.5rem] bg-[#f0e5dc]">
-          <div className="h-28 bg-[linear-gradient(120deg,#f3a58e,#f9d8c8_48%,#cad9d0)]" />
-          <div className="relative px-6 pb-7 text-center">
-            <div className="mx-auto -mt-10 grid h-20 w-20 place-items-center rounded-full border-4 border-white bg-ink-950 text-2xl font-serif font-black text-white">
+      <div className="absolute bottom-0 right-1 z-10 w-[min(82%,340px)] rounded-[1.75rem] border border-ink-900/10 bg-white p-2.5 shadow-[0_28px_70px_rgba(11,31,51,.24)] sm:right-4 sm:p-3">
+        <div className="overflow-hidden rounded-[1.25rem] bg-[#f0e5dc]">
+          <div className="h-16 bg-[linear-gradient(120deg,#f3a58e,#f9d8c8_48%,#cad9d0)]" />
+          <div className="relative px-4 pb-4 text-center">
+            <div className="mx-auto -mt-8 grid h-16 w-16 place-items-center rounded-full border-4 border-white bg-ink-950 text-xl font-serif font-black text-white">
               A
             </div>
-            <p className="mt-3 text-xl font-black tracking-[-0.03em]">
+            <p className="mt-2 text-lg font-black tracking-[-0.03em]">
               Amina Osei
             </p>
-            <p className="mt-1 text-sm text-ink-600">
+            <p className="mt-0.5 text-xs text-ink-600">
               Product designer · Accra
             </p>
-            <p className="mx-auto mt-4 max-w-xs text-sm leading-6 text-ink-600">
-              Designing thoughtful digital products and sharing what I learn
-              along the way.
+            <p className="mx-auto mt-2 max-w-xs text-xs leading-5 text-ink-600">
+              Designing thoughtful digital products and sharing what I learn.
             </p>
-            <div className="mt-5 space-y-2.5">
+            <div className="mt-3 space-y-1.5">
               {profileLinks.map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-left text-sm font-bold shadow-sm"
+                  className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-left text-xs font-bold shadow-sm"
                 >
                   <span>{item.label}</span>
-                  <span className="flex items-center gap-2 text-xs font-medium text-ink-500">
-                    <i className={`h-2 w-2 rounded-full ${item.accent}`} />
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-ink-500">
+                    <i className={`h-1.5 w-1.5 rounded-full ${item.accent}`} />
                     {item.note}
                   </span>
                 </div>
               ))}
             </div>
-            <div className="mt-5 flex items-center justify-center gap-4 text-ink-500">
-              <QrCode size={17} />
-              <Users size={17} />
-              <Menu size={17} />
+            <div className="mt-3 flex items-center justify-center gap-4 text-ink-500">
+              <QrCode size={15} />
+              <Users size={15} />
+              <Menu size={15} />
             </div>
           </div>
         </div>
-      </div>
-      <div className="absolute -bottom-5 -right-5 hidden rounded-xl bg-ink-950 px-4 py-3 text-xs font-bold text-white shadow-xl sm:block">
-        <BarChart3 size={14} className="mr-2 inline text-coral-300" /> 1,248
-        profile views
       </div>
     </div>
   );

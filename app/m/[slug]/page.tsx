@@ -2,6 +2,58 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { Utensils } from "lucide-react";
 import MenuAI from "./menu-ai";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const s = await createClient();
+  const { data: menu } = await s
+    .from("menus")
+    .select("slug,name,description,menu_external_url,organizations(name)")
+    .eq("slug", slug)
+    .eq("active", true)
+    .single();
+
+  if (!menu) return { robots: { index: false, follow: false } };
+
+  if (menu.menu_external_url) {
+    try {
+      const externalUrl = new URL(menu.menu_external_url);
+      if (["http:", "https:"].includes(externalUrl.protocol)) {
+        return { robots: { index: false, follow: false } };
+      }
+    } catch {
+      // Invalid URLs do not redirect; the Connectora menu page remains public.
+    }
+  }
+
+  const organization = menu.organizations as unknown as
+    | { name: string }
+    | { name: string }[]
+    | null;
+  const organizationName = Array.isArray(organization)
+    ? organization[0]?.name
+    : organization?.name;
+  const title = organizationName
+    ? `${menu.name} | ${organizationName}`
+    : `${menu.name} | Digital Menu`;
+  const description =
+    menu.description?.replace(/\s+/g, " ").trim().slice(0, 160) ||
+    `Explore the ${menu.name} digital menu${organizationName ? ` from ${organizationName}` : ""}, powered by Connectora.`;
+  const canonical = `/m/${encodeURIComponent(menu.slug)}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { title, description, url: canonical },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export default async function MenuPage({
   params,

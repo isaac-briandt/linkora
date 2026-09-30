@@ -2,6 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import ProfileClient from "@/app/u/[username]/profile-client";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Connectora Card",
+  robots: { index: false, follow: false },
+};
 
 function safeExternalUrl(value: string | null) {
   if (!value) return null;

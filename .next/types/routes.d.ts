@@ -4,7 +4,7 @@
 type AppRoutes = "/" | "/admin" | "/ai" | "/auth/set-password" | "/c/[cardUid]" | "/contact" | "/dashboard" | "/dashboard/cards" | "/dashboard/profile" | "/e/[token]" | "/experiences" | "/experiences/analytics" | "/experiences/attendance" | "/experiences/cards" | "/experiences/events" | "/experiences/menus" | "/login" | "/m/[slug]" | "/organization/[id]" | "/organization/[id]/ai" | "/organization/[id]/attendance" | "/organization/[id]/cards" | "/organization/[id]/people" | "/organization/[id]/people/[personId]" | "/organization/[id]/people/[personId]/engagement" | "/organizations" | "/organizations/new" | "/p/[personId]" | "/people" | "/register" | "/u/[username]"
 type AppRouteHandlerRoutes = "/api/admin/invite" | "/api/ai" | "/api/attendance" | "/api/events" | "/auth/callback"
 type PageRoutes = never
-type LayoutRoutes = "/"
+type LayoutRoutes = "/" | "/dashboard"
 type RedirectRoutes = never
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
@@ -54,6 +54,7 @@ export type ParamsOf<Route extends Routes> = ParamMap[Route]
 
 interface LayoutSlotMap {
   "/": never
+  "/dashboard": never
 }
 
 
