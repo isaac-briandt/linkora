@@ -1,7 +1,6 @@
 {
-  "/u/[username]/page": "app/u/[username]/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/ai/page": "app/ai/page.js",
-  "/organizations/page": "app/organizations/page.js",
-  "/experiences/page": "app/experiences/page.js"
+  "/icon.svg/route": "app/icon.svg/route.js",
+  "/experiences/menus/page": "app/experiences/menus/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/m/[slug]/page": "app/m/[slug]/page.js"
 }

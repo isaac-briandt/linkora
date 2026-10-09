@@ -104,11 +104,12 @@ create table if not exists public.attendance_records (
 -- Menus
 create table if not exists public.menus (
   id uuid primary key default gen_random_uuid(), organization_id uuid not null references public.organizations(id) on delete cascade,
-  name text not null, slug text unique not null, description text, menu_file_url text, menu_file_name text, menu_external_url text, active boolean not null default true, created_at timestamptz not null default now()
+  name text not null, slug text unique not null, description text, menu_file_url text, menu_file_name text, menu_external_url text, social_links jsonb not null default '{}'::jsonb, active boolean not null default true, created_at timestamptz not null default now()
 );
 alter table public.menus add column if not exists menu_file_url text;
 alter table public.menus add column if not exists menu_file_name text;
 alter table public.menus add column if not exists menu_external_url text;
+alter table public.menus add column if not exists social_links jsonb not null default '{}'::jsonb;
 create table if not exists public.menu_sections (
   id uuid primary key default gen_random_uuid(), menu_id uuid not null references public.menus(id) on delete cascade,
   name text not null, sort_order int not null default 0

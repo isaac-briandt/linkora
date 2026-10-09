@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Building2, Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import OrganizationCard from "./organization-card";
 export default async function OrganizationsPage() {
   const s = await createClient();
   const {
@@ -10,7 +11,9 @@ export default async function OrganizationsPage() {
   if (!user) redirect("/login");
   const { data: members } = await s
     .from("organization_members")
-    .select("organization_id,role,organizations(id,name,slug,type,description)")
+    .select(
+      "organization_id,role,organizations(id,name,slug,type,description,logo_url,created_by)",
+    )
     .eq("profile_id", user.id);
   return (
     <main className="min-h-screen py-10">
@@ -43,35 +46,20 @@ export default async function OrganizationsPage() {
         </div>
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {members?.length ? (
-            members.map((m: any) => (
-              <Link
-                key={m.organization_id}
-                href={`/organization/${m.organization_id}`}
-                className="card p-6 transition hover:-translate-y-0.5"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="rounded-xl bg-coral-50 p-3 text-coral-700">
-                    <Building2 />
-                  </div>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold">
-                    {m.role}
-                  </span>
-                </div>
-                <h2 className="mt-5 text-xl font-black">
-                  {m.organizations?.name}
-                </h2>
-                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-coral-600">
-                  {m.organizations?.type}
-                </p>
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-500">
-                  {m.organizations?.description ||
-                    "Organization workspace powered by Connectora."}
-                </p>
-                <div className="mt-5 flex items-center gap-2 text-sm font-bold text-coral-600">
-                  Open workspace <ArrowRight size={15} />
-                </div>
-              </Link>
-            ))
+            members.map((m: any) => {
+              const organization = Array.isArray(m.organizations)
+                ? m.organizations[0]
+                : m.organizations;
+              if (!organization) return null;
+              return (
+                <OrganizationCard
+                  key={m.organization_id}
+                  organization={organization}
+                  role={m.role}
+                  canDelete={organization.created_by === user.id}
+                />
+              );
+            })
           ) : (
             <div className="card p-8 lg:col-span-3">
               <h2 className="text-xl font-bold">No organizations yet</h2>

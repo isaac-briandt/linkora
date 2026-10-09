@@ -10,9 +10,15 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
   const [slug, setSlug] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [externalUrl, setExternalUrl] = useState("");
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+  });
   const [menus, setMenus] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deletingMenuId, setDeletingMenuId] = useState<string | null>(null);
   const [loadingMenus, setLoadingMenus] = useState(true);
   async function loadMenus() {
     setLoadingMenus(true);
@@ -36,6 +42,33 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
   useEffect(() => {
     loadMenus();
   }, []);
+  async function deleteMenu(menu: any) {
+    if (
+      !window.confirm(
+        `Delete “${menu.name}”? This will remove its public menu page and menu sections.`,
+      )
+    )
+      return;
+
+    setMessage("");
+    setDeletingMenuId(menu.id);
+    const { data, error } = await createClient()
+      .from("menus")
+      .delete()
+      .eq("id", menu.id)
+      .select("id");
+
+    if (error) {
+      setMessage(`Could not delete menu: ${error.message}`);
+    } else if (!data?.length) {
+      setMessage("Menu could not be deleted. Check your organization access and try again.");
+    } else {
+      setMessage(`“${menu.name}” was deleted.`);
+      setMenus((current) => current.filter((item) => item.id !== menu.id));
+    }
+    setDeletingMenuId(null);
+  }
+
   async function create() {
     setMessage("");
     if (!orgId || !name.trim() || !slug.trim()) {
@@ -63,6 +96,18 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
         return setMessage("Enter a complete http:// or https:// menu link.");
       }
     }
+    const cleanSocialLinks: Record<string, string> = {};
+    for (const [platform, value] of Object.entries(socialLinks)) {
+      const url = value.trim();
+      if (!url) continue;
+      try {
+        const parsed = new URL(url);
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
+        cleanSocialLinks[platform] = parsed.toString();
+      } catch {
+        return setMessage(`Enter a complete http:// or https:// ${platform} URL.`);
+      }
+    }
     setBusy(true);
     const cleanSlug = slug
       .trim()
@@ -75,6 +120,7 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
       slug: cleanSlug,
       description: "Published with Connectora",
       menu_external_url: cleanExternalUrl || null,
+      social_links: cleanSocialLinks,
       active: true,
     });
     if (error) setMessage(error.message);
@@ -113,6 +159,7 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
       setSlug("");
       setFile(null);
       setExternalUrl("");
+      setSocialLinks({ instagram: "", facebook: "", tiktok: "" });
       await loadMenus();
     }
     setBusy(false);
@@ -180,6 +227,38 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
               and NFC cards.
             </p>
           </div>
+          <fieldset className="space-y-3 rounded-xl border border-slate-200 p-4">
+            <legend className="px-1 text-sm font-bold text-slate-700">
+              Restaurant socials <span className="font-normal text-slate-400">(optional)</span>
+            </legend>
+            {([
+              ["instagram", "Instagram", "https://instagram.com/yourrestaurant"],
+              ["facebook", "Facebook", "https://facebook.com/yourrestaurant"],
+              ["tiktok", "TikTok", "https://tiktok.com/@yourrestaurant"],
+            ] as const).map(([platform, label, placeholder]) => (
+              <div key={platform}>
+                <label className="label" htmlFor={`menu-social-${platform}`}>
+                  {label}
+                </label>
+                <input
+                  id={`menu-social-${platform}`}
+                  className="input"
+                  type="url"
+                  value={socialLinks[platform]}
+                  onChange={(event) =>
+                    setSocialLinks((current) => ({
+                      ...current,
+                      [platform]: event.target.value,
+                    }))
+                  }
+                  placeholder={placeholder}
+                />
+              </div>
+            ))}
+            <p className="text-xs text-slate-500">
+              Links appear on the public menu page, including when your menu is hosted elsewhere.
+            </p>
+          </fieldset>
           <div>
             <label className="label">Public slug</label>
             <input
@@ -196,7 +275,7 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
           )}
           <button
             onClick={create}
-            disabled={busy}
+            disabled={busy || deletingMenuId !== null}
             className="btn-primary gap-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={16} /> {busy ? "Creating…" : "Create menu"}
@@ -240,7 +319,12 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
                     {menu.organizations?.name} · /m/{menu.slug}
                   </p>
                 </div>
-                <MenuActions slug={menu.slug} />
+                <MenuActions
+                  slug={menu.slug}
+                  onDelete={() => deleteMenu(menu)}
+                  deleting={deletingMenuId === menu.id}
+                  disabled={deletingMenuId !== null}
+                />
               </div>
             ))
           ) : (

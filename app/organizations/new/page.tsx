@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ImagePlus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
 const types = [
   "company",
@@ -17,10 +18,19 @@ export default function NewOrganization() {
   const [name, setName] = useState("");
   const [type, setType] = useState("company");
   const [description, setDescription] = useState("");
+  const [logo, setLogo] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
   async function create() {
+    if (logo && !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(logo.type)) {
+      setError("Choose a JPG, PNG, WebP, or GIF logo.");
+      return;
+    }
+    if (logo && logo.size > 5 * 1024 * 1024) {
+      setError("The logo must be 5 MB or smaller.");
+      return;
+    }
     setBusy(true);
     setError("");
     const s = createClient();
@@ -36,12 +46,27 @@ export default function NewOrganization() {
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
+    let logoPath: string | null = null;
+    let logoUrl: string | null = null;
+    if (logo) {
+      logoPath = `${user.id}/organizations/${crypto.randomUUID()}-${logo.name.replace(/[^a-z0-9._-]/gi, "-")}`;
+      const { data: uploaded, error: uploadError } = await s.storage
+        .from("profile-media")
+        .upload(logoPath, logo, { contentType: logo.type, upsert: false });
+      if (uploadError || !uploaded) {
+        setError(uploadError?.message || "Could not upload the organization logo.");
+        setBusy(false);
+        return;
+      }
+      logoUrl = s.storage.from("profile-media").getPublicUrl(logoPath).data.publicUrl;
+    }
     const { data, error } = await s
       .from("organizations")
-      .insert({ name, slug, type, description, created_by: user.id })
+      .insert({ name, slug, type, description, logo_url: logoUrl, created_by: user.id })
       .select()
       .single();
     if (error) {
+      if (logoPath) await s.storage.from("profile-media").remove([logoPath]);
       setError(error.message);
       setBusy(false);
       return;
@@ -87,6 +112,45 @@ export default function NewOrganization() {
                 </option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="label" htmlFor="organization-logo">
+              Organization logo <span className="font-normal text-slate-400">(optional)</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label
+                htmlFor="organization-logo"
+                className="btn-secondary inline-flex cursor-pointer items-center gap-2"
+              >
+                <ImagePlus size={16} /> {logo ? "Change logo" : "Upload logo"}
+              </label>
+              {logo && (
+                <span className="inline-flex items-center gap-2 text-sm text-slate-600">
+                  <span className="max-w-56 truncate">{logo.name}</span>
+                  <button
+                    type="button"
+                    aria-label="Remove selected logo"
+                    onClick={() => setLogo(null)}
+                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    <X size={15} />
+                  </button>
+                </span>
+              )}
+            </div>
+            <input
+              id="organization-logo"
+              className="sr-only"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={(event) => {
+                setLogo(event.target.files?.[0] || null);
+                setError("");
+              }}
+            />
+            <p className="mt-1.5 text-xs text-slate-500">
+              JPG, PNG, WebP or GIF, up to 5 MB.
+            </p>
           </div>
           <div>
             <label className="label">Description</label>

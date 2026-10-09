@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound, redirect } from "next/navigation";
-import { Utensils } from "lucide-react";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { ExternalLink, Facebook, Instagram, Music2, Utensils } from "lucide-react";
 import MenuAI from "./menu-ai";
 import type { Metadata } from "next";
 
@@ -64,7 +65,7 @@ export default async function MenuPage({
   const s = await createClient();
   const { data: menu } = await s
     .from("menus")
-    .select("*, organizations(name,type)")
+    .select("*, organizations(name,type,logo_url)")
     .eq("slug", slug)
     .eq("active", true)
     .single();
@@ -80,20 +81,13 @@ export default async function MenuPage({
       externalUrl = null;
     }
   }
-  if (externalUrl) {
-    await s.from("engagement_events").insert({
-      event_type: "menu_view",
-      organization_id: menu.organization_id,
-      metadata: { menu_id: menu.id, source: "external_menu" },
-    });
-    redirect(externalUrl.toString());
-  }
-
-  const { data: sections } = await s
-    .from("menu_sections")
-    .select("*")
-    .eq("menu_id", menu.id)
-    .order("sort_order");
+  const { data: sections } = externalUrl
+    ? { data: [] }
+    : await s
+        .from("menu_sections")
+        .select("*")
+        .eq("menu_id", menu.id)
+        .order("sort_order");
   const ids = (sections || []).map((section) => section.id);
   const { data: items } = ids.length
     ? await s
@@ -106,16 +100,45 @@ export default async function MenuPage({
   await s.from("engagement_events").insert({
     event_type: "menu_view",
     organization_id: menu.organization_id,
-    metadata: { menu_id: menu.id },
+    metadata: { menu_id: menu.id, ...(externalUrl ? { source: "external_menu" } : {}) },
+  });
+
+  const socialLinks = menu.social_links as Record<string, string> | null;
+  const socials = [
+    { key: "instagram", label: "Instagram", icon: Instagram },
+    { key: "facebook", label: "Facebook", icon: Facebook },
+    { key: "tiktok", label: "TikTok", icon: Music2 },
+  ].flatMap(({ key, label, icon: Icon }) => {
+    const value = socialLinks?.[key];
+    if (!value) return [];
+    try {
+      const url = new URL(value);
+      return ["http:", "https:"].includes(url.protocol)
+        ? [{ label, icon: Icon, href: url.toString() }]
+        : [];
+    } catch {
+      return [];
+    }
   });
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-2xl">
         <div className="text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-coral-600 text-white">
-            <Utensils />
-          </div>
+          {menu.organizations?.logo_url ? (
+            <Image
+              src={menu.organizations.logo_url}
+              alt={`${menu.organizations.name} logo`}
+              width={88}
+              height={88}
+              unoptimized
+              className="mx-auto h-[88px] w-[88px] rounded-2xl border border-slate-200 bg-white object-contain p-2 shadow-sm"
+            />
+          ) : (
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-coral-600 text-white">
+              <Utensils />
+            </div>
+          )}
           <p className="mt-4 text-sm font-semibold uppercase tracking-wider text-coral-600">
             {menu.organizations?.name}
           </p>
@@ -124,6 +147,33 @@ export default async function MenuPage({
             {menu.description || "Digital menu powered by Connectora."}
           </p>
         </div>
+        {socials.length > 0 && (
+          <nav aria-label="Restaurant social media" className="mt-6 flex flex-wrap justify-center gap-3">
+            {socials.map(({ label, icon: Icon, href }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary gap-2"
+              >
+                <Icon size={17} /> {label}
+              </a>
+            ))}
+          </nav>
+        )}
+        {externalUrl && (
+          <div className="card mt-8 p-4">
+            <a
+              href={externalUrl.toString()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary w-full gap-2"
+            >
+              View full menu <ExternalLink size={16} />
+            </a>
+          </div>
+        )}
         {menu.menu_file_url && (
           <div className="card mt-8 overflow-hidden p-3">
             <a

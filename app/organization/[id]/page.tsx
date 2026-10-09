@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import {
   Users,
@@ -74,7 +75,18 @@ export default async function OrganizationPage({
           <ArrowLeft size={15} /> Organizations
         </Link>
         <div className="mt-5 flex flex-col justify-between gap-4 md:flex-row">
-          <div>
+          <div className="flex items-center gap-4">
+            {org.logo_url && (
+              <Image
+                src={org.logo_url}
+                alt={`${org.name} logo`}
+                width={72}
+                height={72}
+                unoptimized
+                className="h-[72px] w-[72px] shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1"
+              />
+            )}
+            <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-coral-600">
               {org.type}
             </p>
@@ -83,6 +95,7 @@ export default async function OrganizationPage({
               {org.description ||
                 "Organization workspace powered by Connectora."}
             </p>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
