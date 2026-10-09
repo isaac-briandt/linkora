@@ -103,7 +103,8 @@ export default function OrganizationCard({
           {organization.type}
         </p>
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-500">
-          {organization.description || "Organization workspace powered by Connectora."}
+          {organization.description ||
+            "Organization workspace powered by Connectora."}
         </p>
         <div className="mt-5 flex items-center gap-2 text-sm font-bold text-coral-600">
           Open workspace <ArrowRight size={15} />
@@ -117,9 +118,14 @@ export default function OrganizationCard({
             disabled={deleting}
             className="btn-secondary gap-2 text-red-700 hover:bg-red-50 disabled:opacity-50"
           >
-            <Trash2 size={15} /> {deleting ? "Deleting…" : "Delete organization"}
+            <Trash2 size={15} />{" "}
+            {deleting ? "Deleting…" : "Delete organization"}
           </button>
-          {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
+          {error && (
+            <p role="alert" className="mt-2 text-sm text-red-600">
+              {error}
+            </p>
+          )}
         </div>
       )}
     </article>

@@ -87,14 +87,14 @@ export default async function OrganizationPage({
               />
             )}
             <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-coral-600">
-              {org.type}
-            </p>
-            <h1 className="mt-1 text-3xl font-black">{org.name}</h1>
-            <p className="mt-2 text-slate-500">
-              {org.description ||
-                "Organization workspace powered by Connectora."}
-            </p>
+              <p className="text-sm font-semibold uppercase tracking-wider text-coral-600">
+                {org.type}
+              </p>
+              <h1 className="mt-1 text-3xl font-black">{org.name}</h1>
+              <p className="mt-2 text-slate-500">
+                {org.description ||
+                  "Organization workspace powered by Connectora."}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">

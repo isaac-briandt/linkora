@@ -23,7 +23,12 @@ export default function NewOrganization() {
   const [error, setError] = useState("");
   const router = useRouter();
   async function create() {
-    if (logo && !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(logo.type)) {
+    if (
+      logo &&
+      !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(
+        logo.type,
+      )
+    ) {
       setError("Choose a JPG, PNG, WebP, or GIF logo.");
       return;
     }
@@ -54,15 +59,25 @@ export default function NewOrganization() {
         .from("profile-media")
         .upload(logoPath, logo, { contentType: logo.type, upsert: false });
       if (uploadError || !uploaded) {
-        setError(uploadError?.message || "Could not upload the organization logo.");
+        setError(
+          uploadError?.message || "Could not upload the organization logo.",
+        );
         setBusy(false);
         return;
       }
-      logoUrl = s.storage.from("profile-media").getPublicUrl(logoPath).data.publicUrl;
+      logoUrl = s.storage.from("profile-media").getPublicUrl(logoPath)
+        .data.publicUrl;
     }
     const { data, error } = await s
       .from("organizations")
-      .insert({ name, slug, type, description, logo_url: logoUrl, created_by: user.id })
+      .insert({
+        name,
+        slug,
+        type,
+        description,
+        logo_url: logoUrl,
+        created_by: user.id,
+      })
       .select()
       .single();
     if (error) {
@@ -115,7 +130,8 @@ export default function NewOrganization() {
           </div>
           <div>
             <label className="label" htmlFor="organization-logo">
-              Organization logo <span className="font-normal text-slate-400">(optional)</span>
+              Organization logo{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
             </label>
             <div className="flex flex-wrap items-center gap-3">
               <label

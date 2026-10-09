@@ -61,7 +61,9 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
     if (error) {
       setMessage(`Could not delete menu: ${error.message}`);
     } else if (!data?.length) {
-      setMessage("Menu could not be deleted. Check your organization access and try again.");
+      setMessage(
+        "Menu could not be deleted. Check your organization access and try again.",
+      );
     } else {
       setMessage(`“${menu.name}” was deleted.`);
       setMenus((current) => current.filter((item) => item.id !== menu.id));
@@ -105,7 +107,9 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
         if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
         cleanSocialLinks[platform] = parsed.toString();
       } catch {
-        return setMessage(`Enter a complete http:// or https:// ${platform} URL.`);
+        return setMessage(
+          `Enter a complete http:// or https:// ${platform} URL.`,
+        );
       }
     }
     setBusy(true);
@@ -229,13 +233,20 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
           </div>
           <fieldset className="space-y-3 rounded-xl border border-slate-200 p-4">
             <legend className="px-1 text-sm font-bold text-slate-700">
-              Restaurant socials <span className="font-normal text-slate-400">(optional)</span>
+              Restaurant socials{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
             </legend>
-            {([
-              ["instagram", "Instagram", "https://instagram.com/yourrestaurant"],
-              ["facebook", "Facebook", "https://facebook.com/yourrestaurant"],
-              ["tiktok", "TikTok", "https://tiktok.com/@yourrestaurant"],
-            ] as const).map(([platform, label, placeholder]) => (
+            {(
+              [
+                [
+                  "instagram",
+                  "Instagram",
+                  "https://instagram.com/yourrestaurant",
+                ],
+                ["facebook", "Facebook", "https://facebook.com/yourrestaurant"],
+                ["tiktok", "TikTok", "https://tiktok.com/@yourrestaurant"],
+              ] as const
+            ).map(([platform, label, placeholder]) => (
               <div key={platform}>
                 <label className="label" htmlFor={`menu-social-${platform}`}>
                   {label}
@@ -256,7 +267,8 @@ export default function MenuManager({ orgs }: { orgs: any[] }) {
               </div>
             ))}
             <p className="text-xs text-slate-500">
-              Links appear on the public menu page, including when your menu is hosted elsewhere.
+              Links appear on the public menu page, including when your menu is
+              hosted elsewhere.
             </p>
           </fieldset>
           <div>

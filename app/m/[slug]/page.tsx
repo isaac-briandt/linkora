@@ -1,7 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ExternalLink, Facebook, Instagram, Music2, Utensils } from "lucide-react";
+import {
+  ExternalLink,
+  Facebook,
+  Instagram,
+  Music2,
+  Utensils,
+} from "lucide-react";
 import MenuAI from "./menu-ai";
 import type { Metadata } from "next";
 
@@ -100,7 +106,10 @@ export default async function MenuPage({
   await s.from("engagement_events").insert({
     event_type: "menu_view",
     organization_id: menu.organization_id,
-    metadata: { menu_id: menu.id, ...(externalUrl ? { source: "external_menu" } : {}) },
+    metadata: {
+      menu_id: menu.id,
+      ...(externalUrl ? { source: "external_menu" } : {}),
+    },
   });
 
   const socialLinks = menu.social_links as Record<string, string> | null;
@@ -148,7 +157,10 @@ export default async function MenuPage({
           </p>
         </div>
         {socials.length > 0 && (
-          <nav aria-label="Restaurant social media" className="mt-6 flex flex-wrap justify-center gap-3">
+          <nav
+            aria-label="Restaurant social media"
+            className="mt-6 flex flex-wrap justify-center gap-3"
+          >
             {socials.map(({ label, icon: Icon, href }) => (
               <a
                 key={label}
