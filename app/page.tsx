@@ -182,55 +182,14 @@ export default function Home() {
         className="border-b border-ink-900/10 bg-white py-16 sm:py-20"
       >
         <div className="container-page grid gap-10 lg:grid-cols-[.95fr_1.05fr] lg:items-center">
-          <div className="relative min-h-[300px] overflow-hidden rounded-[1.75rem] bg-[#123c37] p-6 sm:min-h-[340px] sm:p-8">
-            <div className="absolute -right-12 -top-14 h-52 w-52 rounded-full bg-emerald-300/20 blur-3xl" />
-            <div className="relative flex h-full min-h-[252px] flex-col justify-center gap-3 sm:min-h-[276px]">
-              <div className="w-[88%] rotate-[-5deg] rounded-2xl border border-white/15 bg-[#f7f5ed] p-4 text-ink-950 shadow-xl sm:w-[78%]">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-500">
-                    Team identity
-                  </span>
-                  <Building2 size={18} className="text-coral-600" />
-                </div>
-                <p className="mt-5 text-xl font-black tracking-tight">
-                  DSTRKT24
-                </p>
-                <p className="mt-1 text-xs text-ink-600">
-                  A brand on a Connectora card
-                </p>
-              </div>
-              <div className="ml-auto w-[88%] rotate-[3deg] rounded-2xl border border-white/15 bg-[#e9f0e9] p-4 text-ink-950 shadow-xl sm:w-[78%]">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-500">
-                    Connected cards
-                  </span>
-                  <Wifi size={18} className="text-coral-600" />
-                </div>
-                <p className="mt-5 text-xl font-black tracking-tight">
-                  MAD SKYZ SALON
-                </p>
-                <p className="mt-1 text-xs text-ink-600">
-                  A business on a Connectora card
-                </p>
-              </div>
-              <div className="w-[88%] rotate-[-2deg] rounded-2xl border border-white/15 bg-[#f5e5d9] p-4 text-ink-950 shadow-xl sm:w-[78%]">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-500">
-                    In-person experiences
-                  </span>
-                  <QrCode size={18} className="text-coral-600" />
-                </div>
-                <p className="mt-5 text-xl font-black tracking-tight">
-                  Your brand, connected.
-                </p>
-                <p className="mt-1 text-xs text-ink-600">
-                  Share a profile with a tap or scan
-                </p>
-              </div>
-            </div>
-            <p className="absolute bottom-4 left-6 text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 sm:left-8">
-              Connected by Connectora
-            </p>
+          <div className="relative aspect-[1.64/1] overflow-hidden rounded-[1.75rem] bg-ink-950 shadow-[0_24px_60px_rgba(11,31,51,.18)]">
+            <Image
+              src="/brand/business-cards-customers.png"
+              alt="Connectora-branded business cards for DSTRKT24, alafeair, and MAD SKYZ Bar & Lounge"
+              fill
+              sizes="(max-width: 1024px) 100vw, 560px"
+              className="object-cover"
+            />
           </div>
 
           <div>
@@ -241,9 +200,9 @@ export default function Home() {
               From personal brands to established businesses.
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-ink-600">
-              These businesses have put their names on Connectora cards. Give
-              your team the same simple way to turn a tap or scan into a branded
-              digital introduction.
+              From personal brands to local businesses, Connectora helps turn
+              introductions into lasting digital connections. Give your team
+              one simple way to share who they are.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
