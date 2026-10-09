@@ -201,8 +201,8 @@ export default function Home() {
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-ink-600">
               From personal brands to local businesses, Connectora helps turn
-              introductions into lasting digital connections. Give your team
-              one simple way to share who they are.
+              introductions into lasting digital connections. Give your team one
+              simple way to share who they are.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
