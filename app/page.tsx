@@ -483,7 +483,7 @@ export default function Home() {
               One platform. Multiple experiences.
             </p>
             <h2 className="mt-4 max-w-2xl font-serif text-4xl font-black leading-tight tracking-[-0.04em] sm:text-5xl">
-              More than profiles—built around real connections.
+              More than profiles. Built around real connections.
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-8 text-white/80">
               Connect people with branded profiles and cards, support event
